@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Request Desk V3 (low-res prototype)</title>
+<style>
+:root{--bg:#f7f4ec;--card:#fff;--colbg:#fffdf7;--text:#171717;--muted:#5f5f5f;--gold:#d4af37;--goldb:#b8901a;--goldtx:#8a6a0a;--bad:#b00020;
+--hdbg:#fffaf0;--hdtx:#171717;--hdsub:#5f5f5f;--colhd:#fff;--colhdtx:#171717;--tagbg:#171717;--tagtx:#fff;--imgbg:#efe6c8;--imgtx:#8a6a0a;--pickbg:#fff;--picktx:#171717;--field:#fff;
+--pat:rgba(184,144,26,.10);--glow:rgba(212,175,55,.22);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0b0b;--card:#1a1a1a;--colbg:#121212;--text:#f4f4f4;--muted:#a9a9a9;--gold:#d9b43c;--goldb:#d9b43c;--goldtx:#e6c552;--bad:#ff7a7a;
+--hdbg:#000;--hdtx:#fff;--hdsub:#b5b5b5;--colhd:#000;--colhdtx:#fff;--tagbg:#f4f4f4;--tagtx:#111;--imgbg:#000;--imgtx:#d9b43c;--pickbg:#000;--picktx:#fff;--field:#0b0b0b;--pat:rgba(217,180,60,.07);--glow:rgba(217,180,60,.14)}}
+:root[data-theme="dark"]{--bg:#0b0b0b;--card:#1a1a1a;--colbg:#121212;--text:#f4f4f4;--muted:#a9a9a9;--gold:#d9b43c;--goldb:#d9b43c;--goldtx:#e6c552;--bad:#ff7a7a;
+--hdbg:#000;--hdtx:#fff;--hdsub:#b5b5b5;--colhd:#000;--colhdtx:#fff;--tagbg:#f4f4f4;--tagtx:#111;--imgbg:#000;--imgtx:#d9b43c;--pickbg:#000;--picktx:#fff;--field:#0b0b0b;--pat:rgba(217,180,60,.07);--glow:rgba(217,180,60,.14)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4;background-color:var(--bg);
+background-image:radial-gradient(circle at 10% 0%,var(--glow),transparent 40%),radial-gradient(circle at 95% 60%,var(--glow),transparent 35%),repeating-linear-gradient(135deg,var(--pat) 0 1px,transparent 1px 26px)}
+.hero{background-color:var(--hdbg);background-image:repeating-linear-gradient(45deg,var(--pat) 0 1px,transparent 1px 14px);border-bottom:3px solid var(--goldb);padding:18px 16px 14px;text-align:center}
+.orn{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--goldtx)}
+.orn span{height:1.5px;width:64px;background:var(--goldb)}
+.orn i{font-style:normal;font-size:13px}
+.brand{font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,6vw,46px);font-weight:400;letter-spacing:.03em;color:var(--hdtx);margin:6px 0 2px;line-height:1.1}
+.brand b{color:var(--goldtx);font-weight:400;font-style:italic}
+.sub{margin:0;color:var(--hdsub);font-size:14px;letter-spacing:.04em}
+.ver{display:inline-block;margin-top:8px;font-size:11px;color:var(--goldtx);border:1px solid var(--goldb);border-radius:999px;padding:2px 10px;letter-spacing:.1em}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:14px;text-align:left}
+.owedbox{color:var(--hdsub);font-size:13px}
+.owedbox b{display:block;color:var(--goldtx);font-size:24px;font-family:Georgia,serif;font-weight:400;line-height:1.1}
+.wrap{padding:16px}
+.btn{border:1.5px solid var(--goldb);background:var(--gold);color:#111;border-radius:8px;padding:9px 16px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--goldb)}
+.hero .btn.ghost{color:var(--hdtx)}
+.btn.danger{background:#171717;color:#fff;border-color:var(--goldb)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.fn.err{color:var(--bad);font-weight:600}
+.cform{background:var(--card);border:2px solid var(--goldb);border-radius:14px;padding:18px;max-width:430px;margin:0 auto 16px}
+.cform h3{margin:0 0 6px;font-family:Georgia,serif;font-size:20px;font-weight:400}
+.cform .ditem{margin-bottom:8px;cursor:default}
+.cform .ditem:hover{box-shadow:none}
+.ditem .thumb{height:80px}
+.hint{margin:-4px 0 10px;font-size:12px;color:var(--muted)}
+.areas{display:none;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.areas button{border:1.5px solid var(--goldb);background:var(--card);color:var(--text);border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;cursor:pointer}
+.areas button.on{background:var(--gold);color:#111;font-weight:600}
+.pd.ar{border-style:dotted}
+.areas button.add{border-style:dashed;background:transparent}
+#info{display:none}
+#app.info #info{display:block}
+#app.info #due,#app.info #inbox,#app.info #tabs,#app.info #board{display:none!important}
+#info h2{margin:0 0 4px;font-family:Georgia,serif;font-size:20px;font-weight:400}
+#info .none{margin:0;font-size:13px;color:var(--muted)}
+.ntext{white-space:pre-wrap;margin-top:4px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--goldb);border-radius:10px;padding:10px;margin-top:8px;cursor:pointer;font-size:14px}
+.opt input{margin-top:4px}
+.opt.on{box-shadow:0 0 0 2px var(--gold)}
+.opt span{color:var(--text)}
+textarea{width:100%;padding:9px;border:1.5px solid var(--goldb);border-radius:8px;background:var(--field);color:var(--text);font:inherit;resize:vertical}
+textarea:focus{outline:2px solid var(--goldb);outline-offset:1px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.tabs{display:none;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.tabs button{border:1.5px solid var(--goldb);background:var(--card);color:var(--text);border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;white-space:nowrap;cursor:pointer}
+.tabs button.on{background:var(--gold);color:#111;border-color:var(--goldb);font-weight:600}
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
+.col{flex:0 0 250px;background:var(--colbg);border:1.5px solid var(--goldb);border-radius:12px;padding:10px;min-height:150px}
+.col h2{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--colhd);color:var(--colhdtx);border:1.5px solid var(--goldb);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center}
+.col h2 span{background:var(--gold);color:#111;border-radius:999px;padding:0 9px;font-size:12px;font-weight:700;letter-spacing:0}
+.card{background:var(--card);border:1.5px solid var(--goldb);border-radius:10px;padding:9px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.card:hover{box-shadow:0 0 0 2px var(--gold)}
+.card.late{border-style:dashed;border-width:2px}
+.img{height:64px;background:var(--imgbg);color:var(--imgtx);border:1px solid var(--goldb);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.08em;margin-bottom:8px}
+.thumb{width:100%;height:96px;object-fit:cover;border-radius:6px;border:1px solid var(--goldb);margin-bottom:8px;display:block}
+.t{font-weight:700;font-size:14px}
+.c{font-size:13px;color:var(--muted)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:12px}
+.tag{background:var(--tagbg);color:var(--tagtx);border-radius:5px;padding:2px 8px;font-weight:600}
+.pd{border:1px solid var(--goldb);border-radius:5px;padding:1px 7px}
+.pd.late-t{color:var(--bad);border-color:var(--bad);border-style:dashed;font-weight:700}
+.owed{background:var(--gold);color:#111;border-radius:5px;padding:2px 8px;font-weight:700}
+.paid{border:1px solid var(--muted);color:var(--muted);border-radius:5px;padding:1px 7px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.ov.on{display:flex}
+.ov{overscroll-behavior:contain}
+body.lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+.dlg{background:var(--card);border:2px solid var(--goldb);border-radius:14px;padding:18px;width:100%;max-width:390px;max-height:92vh;max-height:92dvh;overflow:auto;overscroll-behavior:contain}
+.dlg h3{margin:0 0 6px;font-family:Georgia,serif;font-size:20px;font-weight:400}
+.dlg p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+label.l{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input[type=text],input[type=number],input[type=date],select{width:100%;padding:9px;border:1.5px solid var(--goldb);border-radius:8px;background:var(--field);color:var(--text);font:inherit}
+input:focus,select:focus{outline:2px solid var(--goldb);outline-offset:1px}
+.pick{display:inline-block;position:relative;overflow:hidden;border:1.5px solid var(--goldb);border-radius:8px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;background:var(--pickbg);color:var(--picktx);margin:0 6px 6px 0}
+.over{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.pick.alt{background:transparent;color:var(--text)}
+.hid{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.fn{font-size:12px;color:var(--muted);margin-top:6px}
+.pv{width:100%;max-height:140px;object-fit:contain;border:1px solid var(--goldb);border-radius:8px;margin-top:8px;display:none;background:var(--imgbg)}
+.due{background:var(--card);border:2px solid var(--goldb);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.due h2{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.due h2 span{background:var(--gold);color:#111;border-radius:999px;padding:0 9px;font-size:12px;font-weight:700;letter-spacing:0}
+.due .none{margin:0;font-size:13px;color:var(--muted)}
+.dlist{display:flex;gap:8px;flex-wrap:wrap}
+.ditem{flex:1 1 220px;border:1.5px dashed var(--goldb);border-radius:8px;padding:8px 10px;cursor:pointer;background:var(--card)}
+.ditem:hover{box-shadow:0 0 0 2px var(--gold)}
+.ditem .when{font-size:12px;font-weight:700;margin-top:4px}
+.ditem .when.late-t{color:var(--bad)}
+@media (max-width:700px){.board{display:block;overflow:visible}.col{display:none;width:100%}.col.active{display:block}.tabs{display:flex}.orn span{width:36px}}
+.contact{background:var(--card);border:2px solid var(--goldb);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.ct{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:13px}
+.ct b{font-family:Georgia,serif;font-size:16px;font-weight:400}
+.clink{color:var(--goldtx);font-weight:600}
+.qrbox{background:#fff;border:1.5px solid var(--goldb);border-radius:10px;padding:10px;display:flex;justify-content:center;align-items:center;min-height:120px;color:#444}
+.qrbox svg{width:100%;max-width:320px;height:auto;display:block}
+#qr-link{word-break:break-all;user-select:all}
+</style>
+</head>
+<body>
+<header class="hero" id="hdr">
+  <div class="orn"><span></span><i>&#9670;</i><span></span></div>
+  <h1 class="brand">Request <b>Desk</b></h1>
+  <p class="sub">One board for every job, from request to payment</p>
+  <span class="ver">V3 PROTOTYPE</span>
+  <div class="bar">
+    <div class="owedbox"><span id="totlbl">Total owed</span><b id="tot">$0</b></div>
+    <div><button class="btn" id="add">Add card</button> <button class="btn ghost" id="undo" disabled>Undo delete</button> <button class="btn ghost" id="cv">Client view</button> <button class="btn ghost" id="th">Light mode</button> <button class="btn ghost" id="rst">Reset</button></div>
+  </div>
+</header>
+<div class="wrap" id="app">
+  <div class="areas" id="areas" role="group" aria-label="Filter by area"></div>
+  <div class="contact" id="acontact" style="display:none"></div>
+  <div class="due" id="due" aria-live="polite"></div>
+  <div class="due" id="inbox" style="display:none"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="board" id="board"></div>
+  <div id="info"><h2 id="info-title"></h2><p class="hint" id="info-sub"></p><div id="info-list"></div></div>
+</div>
+
+<div id="client" style="display:none">
+  <header class="hero cl">
+    <div class="orn"><span></span><i>&#9670;</i><span></span></div>
+    <h1 class="brand">Request <b>Desk</b></h1>
+    <p class="sub" id="c-sub">Send a request to your freelancer</p>
+    <span class="ver">CLIENT VIEW · PROTOTYPE</span>
+    <div class="bar">
+      <div class="owedbox" id="c-note">Requests go to the freelancer’s inbox on this device.</div>
+      <div><button class="btn ghost" id="c-back">Back to freelancer view</button></div>
+    </div>
+  </header>
+  <div class="wrap cwrap">
+    <div class="cform" id="c-areabox" style="display:none"></div>
+    <div class="cform">
+      <h3>New request</h3>
+      <label class="l" for="c-name">Your name</label><input id="c-name" type="text" dir="auto" autocomplete="name">
+      <label class="l" for="c-title">What do you need?</label><input id="c-title" type="text" dir="auto" autocomplete="off">
+      <label class="l" for="c-type">Type of request</label><select id="c-type"><option value="new">A new job</option><option value="redo">A change to an earlier job</option></select>
+      <div id="c-refwrap" style="display:none"><label class="l" for="c-ref">Which earlier job?</label><input id="c-ref" type="text" dir="auto" autocomplete="off"></div>
+      <label class="l">Picture <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <label class="pick">Choose picture from gallery<input class="over" id="c-img" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+      <div class="fn" id="c-fn">No picture chosen</div>
+      <img class="pv" id="c-pv" alt="Picture preview">
+      <div><button class="btn ghost" id="c-rm" style="margin-top:8px;padding:5px 10px;font-size:12px;display:none">Remove picture</button></div>
+      <label class="l" for="c-date">Wanted by <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="c-date" type="date">
+      <div class="fn err" id="c-err" style="display:none">Please add your name and what you need.</div>
+      <div class="acts"><button class="btn" id="c-send">Send request</button></div>
+      <div class="fn" id="c-ok" style="display:none">Request sent. The freelancer will review it.</div>
+    </div>
+    <div class="cform">
+      <h3>Your requests</h3>
+      <div id="c-mine"></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt">
+  <h3 id="dt">Job</h3>
+  <label class="l" for="f-client">Client</label><input id="f-client" type="text" dir="auto" autocomplete="off">
+  <label class="l" for="f-title">Job</label><input id="f-title" type="text" dir="auto" autocomplete="off">
+  <div id="f-areawrap" style="display:none"><label class="l" for="f-area">Area</label><select id="f-area"></select></div>
+  <label class="l">Picture <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+  <label class="pick">Choose picture from gallery<input class="over" id="f-img" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+  <div class="fn" id="fn">No picture chosen</div>
+  <div class="fn">If your gallery does not open on your phone, open this page directly in Chrome or Safari, not inside another app.</div>
+  <img class="pv" id="pv" alt="Picture preview">
+  <div><button class="btn ghost" id="rm" style="margin-top:8px;padding:5px 10px;font-size:12px;display:none">Remove picture</button></div>
+  <label class="l" for="f-size">Size</label><select id="f-size"><option value="S">Small</option><option value="L">Large</option></select>
+  <label class="l" for="f-status">Work status</label>
+  <select id="f-status"><option value="New">New (just arrived)</option><option value="In progress">In progress (working on it now)</option><option value="Redo">Redo (changes requested)</option><option value="Pending">Pending (on hold until a date)</option><option value="Done">Done (finished)</option></select>
+  <div id="f-datewrap"><label class="l" for="f-date">Pending date <span style="font-weight:400;color:var(--muted)">(when to come back to it)</span></label><input id="f-date" type="date"><div class="fn err" id="f-dateerr" style="display:none">Pick a day to come back to this job.</div></div>
+  <label class="l" for="f-pay">Payment</label><select id="f-pay"><option value="owed">Owed</option><option value="paid">Paid</option></select>
+  <label class="l" for="f-amt">Amount owed ($)</label><input id="f-amt" type="text" inputmode="numeric" autocomplete="off">
+  <div class="acts">
+    <button class="btn" id="sv">Save</button>
+    <button class="btn ghost" id="mp">Mark paid</button>
+    <button class="btn ghost" id="cn">Cancel</button>
+    <button class="btn ghost" id="dl">Delete</button>
+  </div>
+</div></div>
+
+<div class="ov" id="ov3"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="qt">
+  <h3 id="qt">Client request</h3>
+  <div id="q-sum"></div>
+  <label class="l" for="q-status">Add to</label><select id="q-status"><option value="New">New (just arrived)</option><option value="Redo">Redo (changes requested)</option></select>
+  <label class="l" for="q-size">Size</label><select id="q-size"><option value="S">Small</option><option value="L">Large</option></select>
+  <div id="q-areawrap" style="display:none"><label class="l" for="q-area">Area</label><select id="q-area"></select></div>
+  <label class="l" for="q-amt">Amount owed ($) <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="q-amt" type="text" inputmode="numeric" autocomplete="off">
+  <div class="acts">
+    <button class="btn" id="q-ok">Accept into board</button>
+    <button class="btn ghost" id="q-no">Decline</button>
+    <button class="btn ghost" id="q-cl">Close</button>
+  </div>
+</div></div>
+
+<div class="ov" id="ov4"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="at">
+  <h3 id="at">New area</h3>
+  <p id="a-intro">An area groups related things, such as a second job or your own store.</p>
+  <label class="l" for="a-name">Name</label><input id="a-name" type="text" dir="auto" autocomplete="off">
+  <div id="a-typewrap"><div class="l" style="margin-top:14px">What is this area for?</div>
+  <label class="opt"><input type="radio" name="a-type" value="job" checked><span><b>Jobs</b><br>Requests you work on. They get piles, pending dates and payment.</span></label>
+  <label class="opt"><input type="radio" name="a-type" value="info"><span><b>Information</b><br>Things to keep, such as emails, deadlines and notes. No piles or payment.</span></label>
+  </div>
+  <div class="fn err" id="a-err" style="display:none"></div>
+  <div class="acts"><button class="btn" id="a-ok">Create area</button><button class="btn ghost" id="a-cl">Cancel</button></div>
+</div></div>
+
+<div class="ov" id="ov5"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="nt">
+  <h3 id="nt">Note</h3>
+  <label class="l" for="n-title">Title</label><input id="n-title" type="text" dir="auto" autocomplete="off">
+  <label class="l" for="n-kind">Kind</label><select id="n-kind"><option>Note</option><option>Email</option><option>Deadline</option></select>
+  <label class="l" for="n-date">Date <span style="font-weight:400;color:var(--muted)">(optional, for deadlines)</span></label><input id="n-date" type="date">
+  <label class="l" for="n-text">Details</label><textarea id="n-text" rows="5" dir="auto"></textarea>
+  <label class="l">Picture <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+  <label class="pick">Choose picture from gallery<input class="over" id="n-img" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+  <div class="fn" id="n-fn">No picture chosen</div>
+  <img class="pv" id="n-pv" alt="Picture preview">
+  <div><button class="btn ghost" id="n-rm" style="margin-top:8px;padding:5px 10px;font-size:12px;display:none">Remove picture</button></div>
+  <div class="acts"><button class="btn" id="n-sv">Save</button><button class="btn ghost" id="n-cn">Cancel</button><button class="btn ghost" id="n-dl">Delete</button></div>
+</div></div>
+
+<div class="ov" id="ov6"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="et">
+  <h3 id="et">Edit area</h3>
+  <p id="e-type"></p>
+  <label class="l" for="e-name">Name</label><input id="e-name" type="text" dir="auto" autocomplete="off">
+  <label class="l" for="e-phone">Phone <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="e-phone" type="text" inputmode="tel" autocomplete="off">
+  <label class="l" for="e-addr">Address <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="e-addr" type="text" dir="auto" autocomplete="off">
+  <label class="l" for="e-map">Map location <span style="font-weight:400;color:var(--muted)">(optional, a link or a place name)</span></label><input id="e-map" type="text" dir="auto" autocomplete="off">
+  <div class="fn err" id="e-err" style="display:none"></div>
+  <p class="fn" id="e-warn"></p>
+  <div class="acts"><button class="btn" id="e-sv">Save</button><button class="btn ghost" id="e-cn">Cancel</button><button class="btn danger" id="e-dl">Delete area</button></div>
+</div></div>
+
+<div class="ov" id="ov7"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="qr-title">
+  <h3 id="qr-title">QR code</h3>
+  <p>A client scans this to open the request form for this area on their own phone.</p>
+  <div class="qrbox" id="qr-svg" style="margin-top:12px"></div>
+  <label class="l" for="qr-base">Page address used in the QR code</label>
+  <input id="qr-base" type="text" autocomplete="off" inputmode="url">
+  <div class="fn">Change this if you host the prototype at another address. The QR code only works on other phones when this is a public web address.</div>
+  <div class="fn" id="qr-link"></div>
+  <p class="fn" style="margin-top:10px">Prototype: a request sent from another phone stays in that phone’s inbox. A live version would deliver it to this board.</p>
+  <div class="acts"><button class="btn" id="qr-try">Try it as a client</button><button class="btn ghost" id="qr-copy">Copy link</button><button class="btn ghost" id="qr-cl">Close</button></div>
+  <div class="fn" id="qr-msg"></div>
+</div></div>
+
+<div class="ov" id="ov2"><div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="rt">
+  <h3 id="rt">Reset the board</h3>
+  <p id="r-msg">This deletes every job, note, area, client request and picture. You can bring them back with Undo delete until you close or reload the page.</p>
+  <div class="acts">
+    <button class="btn danger" id="ry">Reset everything</button>
+    <button class="btn danger" id="rda" style="display:none">Delete area too</button>
+    
+    <button class="btn ghost" id="rn">Cancel</button>
+  </div>
+</div></div>
+
+<script>
+(function(){
+  var KEY='rdk3', TH='rd_theme', STATUS=['New','In progress','Redo','Pending','Done'], editing=null, tab='New', img='', undoStack=[], lockY=0, KEYR='rdk3_req', requests=[], reqEditing=null, cimg='', areaFilter='All', areasList=[], notes=[], noteEditing=null, nimg='', areaEditing=null, delArmed=false, clientArea=null, scanned=false, qrArea=null, KEYB='rdk3_base', KEYA='rdk3_areas', KEYN='rdk3_notes',
+      HINT={'New':'Just arrived, not started','In progress':'You are working on it now','Redo':'Changes were requested','Pending':'On hold until the date you set','Done':'Finished and out of your way'};
+  var $=function(i){return document.getElementById(i)};
+  var root=document.documentElement;
+  function eff(){var a=root.getAttribute('data-theme');return a||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function thLabel(){$('th').textContent=eff()==='dark'?'Light mode':'Dark mode'}
+  try{var st=localStorage.getItem(TH);if(st)root.setAttribute('data-theme',st)}catch(e){}
+  thLabel();
+  $('th').onclick=function(){var n=eff()==='dark'?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(TH,n)}catch(e){}thLabel()};
+  function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(x<10?'0':'')+x}
+  function off(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+  function seed(){return []}
+  var jobs;
+  function load(){try{var s=localStorage.getItem(KEY);jobs=s?JSON.parse(s):seed()}catch(e){jobs=seed()}}
+  function loadReq(){try{var q=localStorage.getItem(KEYR);requests=q?JSON.parse(q):[]}catch(e){requests=[]}}
+  function saveReq(){try{localStorage.setItem(KEYR,JSON.stringify(requests))}catch(e){}}
+  function loadMeta(){try{var a=localStorage.getItem(KEYA),n=localStorage.getItem(KEYN);areasList=a?JSON.parse(a):[];notes=n?JSON.parse(n):[]}catch(e){areasList=[];notes=[]}}
+  function saveMeta(){try{localStorage.setItem(KEYA,JSON.stringify(areasList));localStorage.setItem(KEYN,JSON.stringify(notes))}catch(e){}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(jobs))}catch(e){}}
+  function snap(){if(!jobs.length&&!requests.length&&!notes.length&&!areasList.length)return;undoStack.push(JSON.stringify({j:jobs,r:requests,a:areasList,n:notes}));if(undoStack.length>10)undoStack.shift();syncUndo()}
+  function syncUndo(){$('undo').disabled=!undoStack.length}
+  function syncDate(){var p=$('f-status').value==='Pending';$('f-datewrap').style.display=p?'':'none';$('f-dateerr').style.display='none'}
+  function inArea(j){return areaFilter==='All'||(areaFilter==='__none'?!j.area:(j.area||'')===areaFilter)}
+  function jobAreas(){return areasList.filter(function(a){return a.type==='job'})}
+  function defArea(){var a=findArea(areaFilter);if(a&&a.type==='job')return a.name;var ja=jobAreas();return ja.length?ja[0].name:''}
+  function findArea(n){return areasList.filter(function(a){return a.name===n})[0]}
+  function isInfo(){var a=findArea(areaFilter);return !!a&&a.type==='info'}
+  function normAreas(){var have={};areasList.forEach(function(a){have[a.name.toLowerCase()]=1});
+    jobs.forEach(function(j){var n=(j.area||'').trim();if(n&&!have[n.toLowerCase()]){areasList.push({name:n,type:'job'});have[n.toLowerCase()]=1}})}
+  function fillAreaSelect(sel,wrap,ja){var cur=sel.value;sel.innerHTML='';
+    ja.forEach(function(a){var x=document.createElement('option');x.value=a.name;x.textContent=a.name;sel.appendChild(x)});
+    sel.value=cur;if(sel.selectedIndex<0)sel.selectedIndex=0;wrap.style.display=ja.length?'':'none'}
+  function renderAreas(){
+    var box=$('areas'),ja=jobAreas(),hasNone=jobs.some(function(j){return !j.area});
+    fillAreaSelect($('f-area'),$('f-areawrap'),ja);fillAreaSelect($('q-area'),$('q-areawrap'),ja);
+    if(areaFilter!=='All'&&areaFilter!=='__none'&&!findArea(areaFilter))areaFilter='All';
+    if(areaFilter==='__none'&&(!ja.length||!hasNone))areaFilter='All';
+    box.innerHTML='';box.style.display='flex';
+    var opts=[];
+    if(areasList.length){opts.push(['All','All areas']);areasList.forEach(function(a){opts.push([a.name,a.name+(a.type==='info'?' (info)':'')])});if(ja.length&&hasNone)opts.push(['__none','No area'])}
+    opts.forEach(function(o){var bt=document.createElement('button');bt.textContent=o[1];bt.className=areaFilter===o[0]?'on':'';bt.setAttribute('dir','auto');bt.onclick=function(){areaFilter=o[0];render()};box.appendChild(bt)});
+    var nb=document.createElement('button');nb.textContent='+ New area';nb.className='add';nb.onclick=openArea;box.appendChild(nb);
+    if(findArea(areaFilter)){var eb=document.createElement('button');eb.textContent='Edit area';eb.className='add';eb.onclick=openEditArea;box.appendChild(eb)}}
+  function renderInfo(){
+    var inf=isInfo();$('app').classList.toggle('info',inf);$('add').textContent='Add card';$('rst').textContent=areaFilter==='All'?'Reset all':'Reset area';
+    if(!inf)return;
+    var a=findArea(areaFilter),today=off(0),list=notes.filter(function(n){return n.area===a.name});
+    $('totlbl').textContent='Notes in '+a.name;$('tot').textContent=String(list.length);
+    $('info-title').textContent=a.name;$('info-sub').textContent='Information area: keep emails, deadlines and notes here.';
+    var box=$('info-list');box.innerHTML='';
+    if(!list.length){var p=document.createElement('p');p.className='none';p.textContent='Nothing here yet. Tap Add card to keep an email, a deadline or a note.';box.appendChild(p);return}
+    list.sort(function(x,y){if(x.date&&y.date)return x.date<y.date?-1:x.date>y.date?1:0;if(x.date)return -1;if(y.date)return 1;return y.id-x.id});
+    list.forEach(function(n){var el=document.createElement('div');el.className='card';
+      var late=n.kind==='Deadline'&&n.date&&n.date<today;
+      el.innerHTML=(n.img?'<img class="thumb" alt="" src="'+n.img+'">':'')+'<div class="t" dir="auto">'+esc(n.title)+'</div>'+(n.text?'<div class="c ntext" dir="auto">'+esc(n.text)+'</div>':'')+'<div class="row"><span class="tag">'+esc(n.kind)+'</span>'+(n.date?'<span class="pd'+(late?' late-t':'')+'">'+(n.kind==='Deadline'?'Due: ':'')+fmt(n.date)+'</span>':'')+'</div>';
+      el.onclick=function(){openNote(n)};box.appendChild(el)})}
+  function fmt(d){return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function num(s){s=String(s).replace(/[\u0660-\u0669]/g,function(d){return d.charCodeAt(0)-1632}).replace(/[\u06F0-\u06F9]/g,function(d){return d.charCodeAt(0)-1776}).replace(/[^0-9.]/g,'');return Number(s)||0}
+  function render(){
+    var today=off(0),b=$('board'),tb=$('tabs'),tot=0;b.innerHTML='';tb.innerHTML='';renderAreas();var vis=jobs.filter(inArea);
+    STATUS.forEach(function(st){
+      var list=vis.filter(function(j){return j.status===st});
+      var col=document.createElement('div');col.className='col'+(st===tab?' active':'');
+      col.innerHTML='<h2>'+st+' <span>'+list.length+'</span></h2><p class="hint">'+HINT[st]+'</p>';
+      var tbn=document.createElement('button');tbn.textContent=st+' ('+list.length+')';tbn.className=st===tab?'on':'';
+      tbn.onclick=function(){tab=st;render()};tb.appendChild(tbn);
+      list.forEach(function(j){
+        var late=j.status==='Pending'&&j.date&&j.date<=today,isToday=late&&j.date===today;
+        var el=document.createElement('div');el.className='card'+(late?' late':'');
+        el.innerHTML=(j.img?'<img class="thumb" alt="" src="'+j.img+'">':'<div class="img">NO PICTURE</div>')+
+          '<div class="t" dir="auto">'+esc(j.title)+'</div><div class="c" dir="auto">'+esc(j.client)+'</div><div class="row">'+
+          '<span class="tag">'+(j.size==='S'?'Small':'Large')+'</span>'+(j.area&&areaFilter==='All'?'<span class="pd ar" dir="auto">'+esc(j.area)+'</span>':'')+
+          (j.date?'<span class="pd'+(late?' late-t':'')+'">'+(isToday?'Back today':late?'Past pending date: '+fmt(j.date):'Back to it: '+fmt(j.date))+'</span>':'')+
+          (j.pay==='owed'?'<span class="owed">Owed $'+(Number(j.amt)||0)+'</span>':'<span class="paid">Paid</span>')+'</div>';
+        el.onclick=function(){openJob(j)};col.appendChild(el);
+      });
+      b.appendChild(col);
+    });
+    vis.forEach(function(j){if(j.pay==='owed')tot+=Number(j.amt)||0});
+    var dueBox=$('due'),dueJobs=vis.filter(function(j){return j.status==='Pending'&&(!j.date||j.date<=today)}).sort(function(x,y){return x.date<y.date?-1:x.date>y.date?1:0});
+    dueBox.innerHTML='<h2>Back today <span>'+dueJobs.length+'</span></h2>';
+    if(!dueJobs.length){var np=document.createElement('p');np.className='none';np.textContent='Nothing on standby is due back today.';dueBox.appendChild(np)}
+    else{var ls=document.createElement('div');ls.className='dlist';
+      dueJobs.forEach(function(j){var it=document.createElement('div'),lt=!j.date||j.date<today;it.className='ditem';
+        it.innerHTML='<div class="t" dir="auto">'+esc(j.title)+'</div><div class="c" dir="auto">'+esc(j.client)+'</div><div class="when'+(lt?' late-t':'')+'">'+(!j.date?'No pending date set':lt?'Past pending date: '+fmt(j.date):'Due back today')+'</div>';
+        it.onclick=function(){openJob(j)};ls.appendChild(it)});
+      dueBox.appendChild(ls)}
+    $('tot').textContent='$'+tot;$('totlbl').textContent='Total owed'+(areaFilter==='All'?'':' ('+(areaFilter==='__none'?'no area':areaFilter)+')');renderInbox();renderInfo();renderContact();
+  }
+  function setPic(src,name){
+    img=src||'';var pv=$('pv');pv.src=img;pv.style.display=img?'block':'none';
+    $('fn').textContent=img?(name||'Picture added'):'No picture chosen';$('rm').style.display=img?'':'none';$('f-img').value='';
+  }
+  function openJob(j){
+    editing=j;var n=!j;
+    $('dt').textContent=n?'Add card':'Edit card';
+    $('f-client').value=n?'':j.client;$('f-title').value=n?'':j.title;$('f-size').value=n?'S':j.size;var fa=$('f-area'),hb=fa.querySelector('option[value=""]');if(hb)hb.remove();if(!n&&!j.area){var no=document.createElement('option');no.value='';no.textContent='No area';fa.insertBefore(no,fa.firstChild)}fa.value=n?defArea():(j.area||'');
+    $('f-status').value=n?'New':j.status;$('f-date').value=n?'':j.date;$('f-pay').value=n?'owed':j.pay;$('f-amt').value=n?'':(j.amt||'');
+    $('dl').style.display=n?'none':'';$('mp').style.display=n?'none':'';
+    setPic(n?'':(j.img||''),'Current picture');syncDate();
+    $('ov').classList.add('on');document.querySelector('#ov .dlg').scrollTop=0;
+  }
+  function closeJob(){$('ov').classList.remove('on');editing=null}
+  function read(){return {client:$('f-client').value.trim()||'Client',title:$('f-title').value.trim()||'Untitled job',size:$('f-size').value,img:img,area:$('f-area').value.trim(),
+    status:$('f-status').value,date:$('f-date').value,pay:$('f-pay').value,amt:$('f-pay').value==='paid'?0:num($('f-amt').value)}}
+  function handleFile(f){
+    if(!f)return;
+    if(f.type&&f.type.indexOf('image/')!==0){$('fn').textContent='That file is not a picture.';return}
+    $('fn').textContent='Loading picture...';
+    var r=new FileReader();
+    r.onerror=function(){$('fn').textContent='Could not read that picture. Try another one.'};
+    r.onload=function(){
+      var im=new Image();
+      im.onerror=function(){$('fn').textContent='This picture format is not supported. Try a JPG or PNG.'};
+      im.onload=function(){
+        var s=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');
+        c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        setPic(c.toDataURL('image/jpeg',0.7),f.name);
+      };
+      im.src=r.result;
+    };
+    r.readAsDataURL(f);
+  }
+  var blurred=false;
+  window.addEventListener('blur',function(){blurred=true});
+  document.addEventListener('visibilitychange',function(){if(document.hidden)blurred=true});
+  $('f-img').onclick=function(){
+    blurred=false;$('fn').textContent='Opening your gallery...';
+    setTimeout(function(){if(!blurred&&$('fn').textContent==='Opening your gallery...')$('fn').textContent='If the gallery did not open, open this page directly in Chrome or Safari.'},2500)};
+  $('f-img').addEventListener('cancel',function(){if(!img)$('fn').textContent='No picture chosen'});
+  $('f-img').onchange=function(){handleFile(this.files&&this.files[0])};
+  document.addEventListener('paste',function(e){if(!$('ov').classList.contains('on'))return;var fl=e.clipboardData&&e.clipboardData.files;if(fl&&fl[0])handleFile(fl[0])});
+  $('ov').addEventListener('dragover',function(e){e.preventDefault()});
+  $('ov').addEventListener('drop',function(e){e.preventDefault();var fl=e.dataTransfer&&e.dataTransfer.files;if(fl&&fl[0])handleFile(fl[0])});
+  $('rm').onclick=function(){setPic('')};
+  $('add').onclick=function(){if(isInfo())openNote(null);else if(!jobAreas().length)needArea(function(ty){if(ty==='info')openNote(null);else openJob(null)},false);else openJob(null)};
+  $('f-status').onchange=syncDate;
+  $('cn').onclick=closeJob;
+  $('sv').onclick=function(){
+    var v=read();
+    if(v.status==='Pending'&&!v.date){$('f-dateerr').style.display='block';$('f-date').focus();return}
+    if(v.status!=='Pending')v.date='';
+    if(editing){Object.assign(editing,v)}else{v.id=Date.now();jobs.push(v)}
+    if(areaFilter!=='All'&&!inArea(v))areaFilter='All';tab=v.status;save();render();closeJob()};
+  $('mp').onclick=function(){if(editing){editing.pay='paid';editing.amt=0;save();render();closeJob()}};
+  $('dl').onclick=function(){if(editing){snap();jobs=jobs.filter(function(j){return j!==editing});save();render();closeJob()}};
+  $('ov').onclick=function(e){if(e.target===$('ov'))closeJob()};
+  function resetScope(){
+    if(areaFilter==='All')return null;
+    if(areaFilter==='__none')return {name:'No area',none:true,type:'job'};
+    var a=findArea(areaFilter);return a?{name:a.name,type:a.type}:null}
+  function scopeCount(sc){
+    return sc.type==='info'?notes.filter(function(n){return n.area===sc.name}).length
+      :jobs.filter(function(j){return sc.none?!j.area:(j.area||'')===sc.name}).length}
+  $('rst').onclick=function(){
+    var sc=resetScope();
+    if(!sc){$('rt').textContent='Reset the board';
+      $('r-msg').textContent='This deletes every job, note, area, client request and picture in all areas. You can bring them back with Undo delete until you close or reload the page.';
+      $('ry').textContent='Reset everything';$('ry').disabled=false;$('rda').style.display='none'}
+    else{var n=scopeCount(sc),w=sc.type==='info'?'note':'job';
+      $('rt').textContent='Reset '+sc.name;
+      $('r-msg').textContent=n?('This deletes the '+n+' '+w+(n===1?'':'s')+' in this area only. The area stays unless you choose Delete cards and area. Your other areas are not touched. You can bring them back with Undo delete until you close or reload the page.')
+        :('There is nothing in this area to reset.');
+      $('ry').textContent='Delete these '+w+'s';$('ry').disabled=!n;$('rda').style.display=sc.none?'none':'';$('rda').textContent=n?'Delete cards and area':'Delete this area'}
+    $('ov2').classList.add('on')};
+  $('rn').onclick=function(){$('ov2').classList.remove('on')};
+  $('ov2').onclick=function(e){if(e.target===$('ov2'))$('ov2').classList.remove('on')};
+  function resetBoard(list){snap();
+    try{localStorage.removeItem(KEY)}catch(e){}
+    jobs=list;requests=[];saveReq();areasList=[];notes=[];saveMeta();areaFilter='All';tab='New';editing=null;img='';
+    setPic('');$('ov').classList.remove('on');$('ov2').classList.remove('on');
+    save();render();window.scrollTo(0,0)}
+  function resetArea(sc){snap();
+    if(sc.type==='info')notes=notes.filter(function(n){return n.area!==sc.name});
+    else jobs=jobs.filter(function(j){return sc.none?!!j.area:(j.area||'')!==sc.name});
+    save();saveMeta();$('ov2').classList.remove('on');render()}
+  $('rda').onclick=function(){var sc=resetScope();if(!sc||sc.none)return;snap();
+    if(sc.type==='info')notes=notes.filter(function(n){return n.area!==sc.name});
+    else jobs=jobs.filter(function(j){return (j.area||'')!==sc.name});
+    areasList=areasList.filter(function(a){return a.name!==sc.name});areaFilter='All';
+    save();saveMeta();$('ov2').classList.remove('on');render()};
+  $('ry').onclick=function(){var sc=resetScope();if(sc)resetArea(sc);else resetBoard([])};
+  $('undo').onclick=function(){if(!undoStack.length)return;var p=JSON.parse(undoStack.pop());jobs=p.j;requests=p.r;areasList=p.a||[];notes=p.n||[];save();saveReq();saveMeta();render();syncUndo()};
+  function renderInbox(){
+    var box=$('inbox'),list=requests.filter(function(r){return r.state==='received'});
+    box.style.display=list.length?'':'none';
+    box.innerHTML='<h2>Client requests <span>'+list.length+'</span></h2>';
+    if(!list.length)return;
+    var ls=document.createElement('div');ls.className='dlist';
+    list.forEach(function(r){var it=document.createElement('div');it.className='ditem';
+      it.innerHTML=(r.img?'<img class="thumb" alt="" src="'+r.img+'">':'')+'<div class="t" dir="auto">'+esc(r.title)+'</div><div class="c" dir="auto">'+esc(r.client)+'</div><div class="row"><span class="tag">'+(r.type==='redo'?'Change':'New job')+'</span>'+(r.wanted?'<span class="pd">Wanted by: '+fmt(r.wanted)+'</span>':'')+'</div>';
+      if(r.area)it.querySelector('.row').insertAdjacentHTML('beforeend','<span class="pd ar" dir="auto">'+esc(r.area)+'</span>');it.onclick=function(){openReq(r)};ls.appendChild(it)});
+    box.appendChild(ls)}
+  function openReq(r){
+    if(!jobAreas().length){needArea(function(){openReq(r)},true);return}
+    reqEditing=r;
+    $('q-sum').innerHTML=(r.img?'<img class="thumb" style="height:140px" alt="" src="'+r.img+'">':'')+'<div class="t" dir="auto">'+esc(r.title)+'</div><div class="c" dir="auto">'+esc(r.client)+'</div><div class="row"><span class="tag">'+(r.type==='redo'?'Change to an earlier job':'New job')+'</span>'+(r.wanted?'<span class="pd">Wanted by: '+fmt(r.wanted)+'</span>':'')+'</div>'+(r.ref?'<div class="fn" dir="auto">About: '+esc(r.ref)+'</div>':'');
+    $('q-status').value=r.type==='redo'?'Redo':'New';$('q-size').value='S';$('q-amt').value='';
+    var ra=r.area&&findArea(r.area);$('q-area').value=(ra&&ra.type==='job')?r.area:defArea();
+    if(r.area)$('q-sum').querySelector('.row').insertAdjacentHTML('beforeend','<span class="pd ar" dir="auto">'+esc(r.area)+'</span>');
+    $('ov3').classList.add('on');document.querySelector('#ov3 .dlg').scrollTop=0}
+  function closeReq(){$('ov3').classList.remove('on');reqEditing=null}
+  $('q-cl').onclick=closeReq;
+  $('ov3').onclick=function(e){if(e.target===$('ov3'))closeReq()};
+  $('q-ok').onclick=function(){var r=reqEditing;if(!r)return;var id=Date.now(),st=$('q-status').value;
+    jobs.push({id:id,client:r.client,title:r.title,size:$('q-size').value,area:$('q-area').value.trim(),status:st,date:'',pay:'owed',amt:num($('q-amt').value),img:r.img||''});
+    if(areaFilter!=='All'&&!inArea(jobs[jobs.length-1]))areaFilter='All';r.state='accepted';r.jobId=id;tab=st;save();saveReq();render();closeReq()};
+  $('q-no').onclick=function(){var r=reqEditing;if(!r)return;r.state='declined';saveReq();render();closeReq()};
+  function cstatus(r){
+    if(r.state==='declined')return 'Declined';
+    if(r.state==='received')return 'Received';
+    var j=jobs.filter(function(x){return x.id===r.jobId})[0];
+    if(!j)return 'Closed';
+    return j.status==='Done'?'Done':j.status==='New'?'Accepted':'In progress'}
+  function renderMine(){
+    var nm=$('c-name').value.trim().toLowerCase(),box=$('c-mine'),p;box.innerHTML='';
+    if(!nm){p=document.createElement('p');p.className='none';p.textContent='Type your name above to see your requests.';box.appendChild(p);return}
+    var mine=requests.filter(function(r){return r.client.trim().toLowerCase()===nm}).sort(function(x,y){return y.id-x.id});
+    if(!mine.length){p=document.createElement('p');p.className='none';p.textContent='No requests yet.';box.appendChild(p);return}
+    mine.forEach(function(r){var el=document.createElement('div');el.className='ditem';
+      el.innerHTML='<div class="t" dir="auto">'+esc(r.title)+'</div><div class="row"><span class="tag">'+(r.type==='redo'?'Change':'New job')+'</span><span class="pd">'+cstatus(r)+'</span></div>';
+      box.appendChild(el)})}
+  function syncType(){$('c-refwrap').style.display=$('c-type').value==='redo'?'':'none'}
+  function setCPic(src,name){
+    cimg=src||'';var pv=$('c-pv');pv.src=cimg;pv.style.display=cimg?'block':'none';
+    $('c-fn').textContent=cimg?(name||'Picture added'):'No picture chosen';$('c-rm').style.display=cimg?'':'none';$('c-img').value=''}
+  function shrink(f,cb,fail){
+    if(f.type&&f.type.indexOf('image/')!==0){fail('That file is not a picture.');return}
+    var r=new FileReader();
+    r.onerror=function(){fail('Could not read that picture. Try another one.')};
+    r.onload=function(){var im=new Image();
+      im.onerror=function(){fail('This picture format is not supported. Try a JPG or PNG.')};
+      im.onload=function(){var s=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');
+        c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7))};
+      im.src=r.result};
+    r.readAsDataURL(f)}
+  $('c-img').onchange=function(){var f=this.files&&this.files[0];if(!f)return;
+    $('c-fn').textContent='Loading picture...';
+    shrink(f,function(d){setCPic(d,f.name)},function(m){$('c-fn').textContent=m})};
+  $('c-rm').onclick=function(){setCPic('')};
+  $('c-type').onchange=syncType;
+  $('c-name').oninput=renderMine;
+  $('c-send').onclick=function(){
+    var nm=$('c-name').value.trim(),tt=$('c-title').value.trim(),ty=$('c-type').value;
+    $('c-ok').style.display='none';
+    if(!nm||!tt){$('c-err').style.display='block';return}
+    $('c-err').style.display='none';
+    requests.push({id:Date.now(),client:nm,title:tt,type:ty,ref:ty==='redo'?$('c-ref').value.trim():'',wanted:$('c-date').value,img:cimg,area:clientArea?clientArea.name:'',state:'received',jobId:null});
+    saveReq();
+    $('c-title').value='';$('c-ref').value='';$('c-date').value='';$('c-type').value='new';syncType();setCPic('');
+    $('c-ok').textContent='Request sent'+(clientArea?' to '+clientArea.name:'')+'. The freelancer will review it.';$('c-ok').style.display='block';renderMine()};
+  function showClient(){$('c-back').style.display=scanned?'none':'';$('c-note').textContent=scanned?'Prototype: your request is saved on this phone for now. A live version would send it to the freelancer.':'Requests go to the freelancer’s inbox on this device.';$('hdr').style.display='none';$('app').style.display='none';$('client').style.display='';$('c-ok').style.display='none';$('c-err').style.display='none';renderCArea();renderMine();window.scrollTo(0,0)}
+  function showFree(){clientArea=null;scanned=false;try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+    $('client').style.display='none';$('hdr').style.display='';$('app').style.display='';render();window.scrollTo(0,0)}
+  $('cv').onclick=function(){clientArea=null;scanned=false;showClient()};
+  $('c-back').onclick=showFree;
+  function setType(t){var r=document.getElementsByName('a-type');for(var i=0;i<r.length;i++){r[i].checked=r[i].value===t;r[i].parentNode.classList.toggle('on',r[i].checked)}}
+  (function(){var r=document.getElementsByName('a-type');for(var i=0;i<r.length;i++){r[i].onchange=function(){setType(this.value)}}})();
+  var pendingNext=null;
+  function showAreaDlg(forced,jobOnly){
+    $('a-name').value='';$('a-err').style.display='none';setType('job');
+    var legacy=jobs.filter(function(j){return !j.area}).length,first=!jobAreas().length,t;
+    $('at').textContent=forced?'Create an area first':'New area';
+    t=!forced?'An area groups related things, such as a second job or your own store.':jobOnly?'Every job lives in an area, so create one before accepting requests. For example: My work, or My store.':'Cards live in areas, so create one first. Choose Jobs for requests you work on, or Information for notes, emails and deadlines.';
+    if(first&&legacy)t+=(jobOnly?' Your ':' If it is a Jobs area, your ')+legacy+' existing job'+(legacy===1?'':'s')+(legacy===1?' is':' are')+' placed in it.';
+    $('a-intro').textContent=t;$('a-typewrap').style.display=jobOnly?'none':'';
+    $('ov4').classList.add('on');document.querySelector('#ov4 .dlg').scrollTop=0}
+  function openArea(){pendingNext=null;showAreaDlg(false)}
+  function needArea(next,jobOnly){pendingNext=next;showAreaDlg(true,!!jobOnly)}
+  function closeArea(){$('ov4').classList.remove('on');pendingNext=null}
+  function areaErr(m){$('a-err').textContent=m;$('a-err').style.display='block'}
+  $('a-cl').onclick=closeArea;
+  $('ov4').onclick=function(e){if(e.target===$('ov4'))closeArea()};
+  $('a-ok').onclick=function(){
+    var nm=$('a-name').value.trim(),ty=document.querySelector('input[name=a-type]:checked').value;
+    if(!nm){areaErr('Please give the area a name.');return}
+    if(areasList.some(function(a){return a.name.toLowerCase()===nm.toLowerCase()})){areaErr('You already have an area with that name.');return}
+    var firstJob=ty==='job'&&!jobAreas().length;areasList.push({name:nm,type:ty});
+    if(firstJob)jobs.forEach(function(j){if(!j.area)j.area=nm});
+    saveMeta();save();areaFilter=nm;var nx=pendingNext;closeArea();render();if(nx)nx(ty)};
+  function setNPic(src,name){nimg=src||'';var pv=$('n-pv');pv.src=nimg;pv.style.display=nimg?'block':'none';$('n-fn').textContent=nimg?(name||'Picture added'):'No picture chosen';$('n-rm').style.display=nimg?'':'none';$('n-img').value=''}
+  $('n-img').onchange=function(){var f=this.files&&this.files[0];if(!f)return;$('n-fn').textContent='Loading picture...';shrink(f,function(d){setNPic(d,f.name)},function(m){$('n-fn').textContent=m})};
+  $('n-rm').onclick=function(){setNPic('')};
+  function openNote(n){
+    noteEditing=n;var nw=!n;
+    $('nt').textContent=nw?'Add card':'Edit card';
+    $('n-title').value=nw?'':n.title;$('n-kind').value=nw?'Note':n.kind;$('n-date').value=nw?'':(n.date||'');$('n-text').value=nw?'':(n.text||'');
+    $('n-dl').style.display=nw?'none':'';
+    setNPic(nw?'':(n.img||''),'Current picture');
+    $('ov5').classList.add('on');document.querySelector('#ov5 .dlg').scrollTop=0}
+  function closeNote(){$('ov5').classList.remove('on');noteEditing=null}
+  $('n-cn').onclick=closeNote;
+  $('ov5').onclick=function(e){if(e.target===$('ov5'))closeNote()};
+  $('n-sv').onclick=function(){
+    var a=findArea(areaFilter);if(!a)return;
+    var v={title:$('n-title').value.trim()||'Untitled note',kind:$('n-kind').value,date:$('n-date').value,text:$('n-text').value.trim(),img:nimg};
+    if(noteEditing){Object.assign(noteEditing,v)}else{v.id=Date.now();v.area=a.name;notes.push(v)}
+    saveMeta();render();closeNote()};
+  $('n-dl').onclick=function(){if(noteEditing){snap();notes=notes.filter(function(n){return n!==noteEditing});saveMeta();render();closeNote()}};
+  function eErr(m){$('e-err').textContent=m;$('e-err').style.display='block'}
+  function openEditArea(){
+    var a=findArea(areaFilter);if(!a)return;areaEditing=a;delArmed=false;
+    $('e-name').value=a.name;$('e-phone').value=a.phone||'';$('e-addr').value=a.addr||'';$('e-map').value=a.map||'';$('e-err').style.display='none';$('e-dl').textContent='Delete area';
+    $('e-type').textContent=a.type==='info'?'Information area (emails, deadlines and notes)':'Job area (requests with piles and payment)';
+    var n=a.type==='info'?notes.filter(function(x){return x.area===a.name}).length:jobs.filter(function(j){return (j.area||'')===a.name}).length;
+    $('e-warn').textContent=a.type==='info'
+      ?('Deleting this area also deletes its '+n+' note'+(n===1?'':'s')+'. Undo delete can bring them back.')
+      :('Deleting this area keeps its '+n+' job'+(n===1?'':'s')+' and moves '+(n===1?'it':'them')+' to No area.');
+    $('ov6').classList.add('on');document.querySelector('#ov6 .dlg').scrollTop=0}
+  function closeEditArea(){$('ov6').classList.remove('on');areaEditing=null;delArmed=false}
+  $('e-cn').onclick=closeEditArea;
+  $('ov6').onclick=function(e){if(e.target===$('ov6'))closeEditArea()};
+  $('e-name').oninput=function(){$('e-err').style.display='none'};
+  $('e-sv').onclick=function(){
+    var a=areaEditing;if(!a)return;var nm=$('e-name').value.trim();
+    if(!nm){eErr('Please give the area a name.');return}
+    if(areasList.some(function(x){return x!==a&&x.name.toLowerCase()===nm.toLowerCase()})){eErr('You already have an area with that name.');return}
+    var old=a.name;a.name=nm;a.phone=$('e-phone').value.trim();a.addr=$('e-addr').value.trim();a.map=$('e-map').value.trim();
+    if(a.type==='info')notes.forEach(function(x){if(x.area===old)x.area=nm});
+    else jobs.forEach(function(j){if((j.area||'')===old)j.area=nm});
+    if(areaFilter===old)areaFilter=nm;
+    save();saveMeta();closeEditArea();render()};
+  $('e-dl').onclick=function(){
+    var a=areaEditing;if(!a)return;
+    if(!delArmed){delArmed=true;$('e-dl').textContent='Tap again to delete';return}
+    snap();
+    if(a.type==='info'){notes=notes.filter(function(x){return x.area!==a.name})}
+    else{jobs.forEach(function(j){if((j.area||'')===a.name)j.area=''})}
+    areasList=areasList.filter(function(x){return x!==a});areaFilter='All';
+    save();saveMeta();closeEditArea();render()};
+  /*QR-START*/
+function qrMatrix(text){
+  var enc=unescape(encodeURIComponent(text)),data=[],i,j;
+  for(i=0;i<enc.length;i++)data.push(enc.charCodeAt(i));
+  var TB={
+    M:{f:0,e:[0,10,16,26,18,24,16,18,22,22,26,30,22,22,24,24,28,28,26,26,26],b:[0,1,1,1,2,2,4,4,4,5,5,5,8,9,9,10,10,11,13,14,16]},
+    L:{f:1,e:[0,7,10,15,20,26,18,20,24,30,18,20,24,26,30,22,24,28,30,28,28],b:[0,1,1,1,1,1,2,2,2,2,4,4,4,4,4,6,6,6,6,7,8]}
+  };
+  function rawMods(v){var r=(16*v+128)*v+64;if(v>=2){var na=Math.floor(v/7)+2;r-=(25*na-10)*na-55;if(v>=7)r-=36}return r}
+  var ecl=null,ver=0,cap=0,lv=[TB.M,TB.L],li,v;
+  for(li=0;li<2&&!ecl;li++){for(v=1;v<=20;v++){
+    var c=Math.floor(rawMods(v)/8)-lv[li].e[v]*lv[li].b[v];
+    if(Math.ceil((4+(v<=9?8:16)+data.length*8)/8)<=c){ecl=lv[li];ver=v;cap=c;break}}}
+  if(!ecl)throw new Error('too long');
+  var bits=[];function put(val,len){for(var k=len-1;k>=0;k--)bits.push((val>>>k)&1)}
+  put(4,4);put(data.length,ver<=9?8:16);data.forEach(function(b){put(b,8)});
+  put(0,Math.min(4,cap*8-bits.length));while(bits.length%8)bits.push(0);
+  for(var pad=0xEC;bits.length<cap*8;pad^=0xEC^0x11)put(pad,8);
+  var cw=[];for(i=0;i<bits.length;i+=8){var by=0;for(j=0;j<8;j++)by=(by<<1)|bits[i+j];cw.push(by)}
+  function gm(x,y){var z=0;for(var k=7;k>=0;k--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>k)&1)*x}return z&255}
+  function rsDiv(d){var r=[];for(var k=0;k<d-1;k++)r.push(0);r.push(1);var root=1;
+    for(k=0;k<d;k++){for(var m=0;m<r.length;m++){r[m]=gm(r[m],root);if(m+1<r.length)r[m]^=r[m+1]}root=gm(root,2)}return r}
+  function rsRem(d,dv){var r=dv.map(function(){return 0});d.forEach(function(b){var f=b^r.shift();r.push(0);dv.forEach(function(cf,k){r[k]^=gm(cf,f)})});return r}
+  var nb=ecl.b[ver],eb=ecl.e[ver],raw=Math.floor(rawMods(ver)/8),nShort=nb-raw%nb,sLen=Math.floor(raw/nb),blocks=[],dv=rsDiv(eb),k=0;
+  for(i=0;i<nb;i++){var dl=sLen-eb+(i<nShort?0:1),dat=cw.slice(k,k+dl);k+=dl;var ecc=rsRem(dat,dv);if(i<nShort)dat.push(0);blocks.push(dat.concat(ecc))}
+  var all=[];for(i=0;i<blocks[0].length;i++)blocks.forEach(function(blk,jj){if(i!=sLen-eb||jj>=nShort)all.push(blk[i])});
+  var size=ver*4+17,mod=[],fn=[];
+  for(i=0;i<size;i++){mod.push(new Array(size).fill(0));fn.push(new Array(size).fill(false))}
+  function setF(x,y,d){mod[y][x]=d?1:0;fn[y][x]=true}
+  for(i=0;i<size;i++){setF(6,i,i%2===0);setF(i,6,i%2===0)}
+  function finder(cx,cy){for(var dy=-4;dy<=4;dy++)for(var dx=-4;dx<=4;dx++){var dist=Math.max(Math.abs(dx),Math.abs(dy)),xx=cx+dx,yy=cy+dy;if(xx>=0&&xx<size&&yy>=0&&yy<size)setF(xx,yy,dist!==2&&dist!==4)}}
+  finder(3,3);finder(size-4,3);finder(3,size-4);
+  var ap=[];if(ver>1){var na=Math.floor(ver/7)+2,step=ver===32?26:Math.ceil((ver*4+4)/(na*2-2))*2;ap=[6];for(var pos=size-7;ap.length<na;pos-=step)ap.splice(1,0,pos)}
+  for(i=0;i<ap.length;i++)for(j=0;j<ap.length;j++){
+    if((i===0&&j===0)||(i===0&&j===ap.length-1)||(i===ap.length-1&&j===0))continue;
+    for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++)setF(ap[i]+dx,ap[j]+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}
+  function bit(x,n){return((x>>>n)&1)!==0}
+  function fmtBits(mask){
+    var d=(ecl.f<<3)|mask,rem=d;for(var q=0;q<10;q++)rem=(rem<<1)^((rem>>>9)*0x537);
+    var b=((d<<10)|rem)^0x5412,q2;
+    for(q2=0;q2<=5;q2++)setF(8,q2,bit(b,q2));setF(8,7,bit(b,6));setF(8,8,bit(b,7));setF(7,8,bit(b,8));for(q2=9;q2<15;q2++)setF(14-q2,8,bit(b,q2));
+    for(q2=0;q2<8;q2++)setF(size-1-q2,8,bit(b,q2));for(q2=8;q2<15;q2++)setF(8,size-15+q2,bit(b,q2));setF(8,size-8,true)}
+  fmtBits(0);
+  if(ver>=7){var rem=ver;for(i=0;i<12;i++)rem=(rem<<1)^((rem>>>11)*0x1F25);var vb=(ver<<12)|rem;
+    for(i=0;i<18;i++){var bt=bit(vb,i),a=size-11+i%3,b2=Math.floor(i/3);setF(a,b2,bt);setF(b2,a,bt)}}
+  var idx=0;
+  for(var right=size-1;right>=1;right-=2){if(right===6)right=5;
+    for(var vert=0;vert<size;vert++)for(j=0;j<2;j++){var x=right-j,up=((right+1)&2)===0,y=up?size-1-vert:vert;
+      if(!fn[y][x]&&idx<all.length*8){mod[y][x]=bit(all[idx>>>3],7-(idx&7))?1:0;idx++}}}
+  function applyMask(m){for(var y=0;y<size;y++)for(var x=0;x<size;x++){var inv;
+    switch(m){case 0:inv=(x+y)%2===0;break;case 1:inv=y%2===0;break;case 2:inv=x%3===0;break;case 3:inv=(x+y)%3===0;break;
+      case 4:inv=(Math.floor(x/3)+Math.floor(y/2))%2===0;break;case 5:inv=x*y%2+x*y%3===0;break;
+      case 6:inv=(x*y%2+x*y%3)%2===0;break;default:inv=((x+y)%2+x*y%3)%2===0}
+    if(!fn[y][x]&&inv)mod[y][x]^=1}}
+  function penalty(){var p=0,x,y,run,col,n;
+    for(var pass=0;pass<2;pass++){for(y=0;y<size;y++){run=1;col=pass?mod[0][y]:mod[y][0];var line=[];
+      for(x=0;x<size;x++){var cur=pass?mod[x][y]:mod[y][x];line.push(cur);if(x>0){if(cur===col)run++;else{if(run>=5)p+=3+run-5;col=cur;run=1}}}
+      if(run>=5)p+=3+run-5;
+      for(x=0;x+10<size;x++){var s=line.slice(x,x+11).join('');if(s==='10111010000'||s==='00001011101')p+=40}}}
+    for(y=0;y<size-1;y++)for(x=0;x<size-1;x++){var c0=mod[y][x];if(c0===mod[y][x+1]&&c0===mod[y+1][x]&&c0===mod[y+1][x+1])p+=3}
+    var dark=0;for(y=0;y<size;y++)for(x=0;x<size;x++)dark+=mod[y][x];var tot=size*size;
+    p+=(Math.ceil(Math.abs(dark*20-tot*10)/tot)-1)*10;return p}
+  var best=0,bp=1e9;
+  for(var m=0;m<8;m++){applyMask(m);fmtBits(m);var pn=penalty();if(pn<bp){bp=pn;best=m}applyMask(m)}
+  applyMask(best);fmtBits(best);
+  return mod;
+}
+/*QR-END*/
+
+  function qrSvg(m){var n=m.length,q=4,d='',x,y,s;
+    for(y=0;y<n;y++){x=0;while(x<n){if(m[y][x]){s=x;while(x<n&&m[y][x])x++;d+='M'+(s+q)+' '+(y+q)+'h'+(x-s)+'v1h-'+(x-s)+'z'}else x++}}
+    return '<svg viewBox="0 0 '+(n+2*q)+' '+(n+2*q)+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>'}
+  function mapHref(m){m=(m||'').trim();if(!m)return '';return /^https?:\/\//i.test(m)?m:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m)}
+  function telHref(p){var d=(p||'').replace(/[^\d+]/g,'');return d?'tel:'+d:''}
+  function contactParts(c){var o=[];
+    if(c.phone){var th=telHref(c.phone);o.push('<span>Phone: '+(th?'<a class="clink" href="'+esc(th)+'">'+esc(c.phone)+'</a>':esc(c.phone))+'</span>')}
+    if(c.addr)o.push('<span dir="auto">Address: '+esc(c.addr)+'</span>');
+    if(c.map)o.push('<span><a class="clink" href="'+esc(mapHref(c.map))+'" target="_blank" rel="noopener">Open in maps</a></span>');
+    return o}
+  function renderContact(){
+    var a=findArea(areaFilter),box=$('acontact');
+    if(!a||(a.type==='info'&&!(a.phone||a.addr||a.map))){box.style.display='none';return}
+    var parts=contactParts(a);box.style.display='';
+    box.innerHTML='<div class="ct"><b dir="auto">'+esc(a.name)+'</b>'+(parts.length?parts.join(''):'<span class="c">No contact details yet. Add them with Edit area.</span>')+'</div>'+
+      (a.type==='job'?'<div class="acts" style="margin-top:8px"><button class="btn ghost" id="qrbtn" style="padding:6px 12px;font-size:13px">QR code for clients</button></div>':'');
+    var qb=$('qrbtn');if(qb)qb.onclick=openQr}
+  function renderCArea(){
+    var b=$('c-areabox'),s=$('c-sub');
+    if(!clientArea){b.style.display='none';s.textContent='Send a request to your freelancer';return}
+    s.textContent='Send a request to '+clientArea.name;
+    var parts=contactParts(clientArea);b.style.display='';
+    b.innerHTML='<h3 dir="auto">'+esc(clientArea.name)+'</h3>'+(parts.length?'<div class="ct" style="margin-top:6px">'+parts.join('')+'</div>':'<p class="c" style="margin:4px 0 0">Your request goes to this area.</p>')}
+  function areaToken(a){var o={n:a.name};if(a.phone)o.p=a.phone;if(a.addr)o.a=a.addr;if(a.map)o.m=a.map;var j=JSON.stringify(o);
+    return btoa(unescape(encodeURIComponent(j))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+  function tokenToArea(t){try{var s=String(t).replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';
+    var o=JSON.parse(decodeURIComponent(escape(atob(s))));if(!o||!o.n)return null;
+    return {name:String(o.n),phone:String(o.p||''),addr:String(o.a||''),map:String(o.m||'')}}catch(e){return null}}
+  function baseUrl(){var b='';try{b=localStorage.getItem(KEYB)||''}catch(e){}
+    if(!b&&/^https?:$/i.test(location.protocol))b=location.origin+location.pathname;return b}
+  function qrLink(){var b=($('qr-base').value||'').trim();return(b&&qrArea)?b.split('#')[0]+'#'+areaToken(qrArea):''}
+  function drawQr(){
+    var link=qrLink(),box=$('qr-svg'),b=($('qr-base').value||'').trim();
+    $('qr-msg').textContent='';
+    if(!link){box.innerHTML='<span>Add the page address below to create the QR code.</span>';$('qr-link').textContent='';return}
+    try{box.innerHTML=qrSvg(qrMatrix(link))}catch(e){box.innerHTML='<span>The details are too long for a QR code. Shorten the name or the contact details.</span>';$('qr-link').textContent='';return}
+    $('qr-link').textContent=link;
+    if(!/^https?:\/\//i.test(b))$('qr-msg').textContent='Tip: a QR code that opens in a phone browser needs a full address that starts with https://'}
+  function openQr(){
+    qrArea=findArea(areaFilter);if(!qrArea||qrArea.type!=='job')return;
+    $('qr-title').textContent='QR code for '+qrArea.name;$('qr-base').value=baseUrl();drawQr();
+    $('ov7').classList.add('on');document.querySelector('#ov7 .dlg').scrollTop=0}
+  function closeQr(){$('ov7').classList.remove('on')}
+  $('qr-cl').onclick=closeQr;
+  $('ov7').onclick=function(e){if(e.target===$('ov7'))closeQr()};
+  $('qr-base').oninput=function(){var v=this.value.trim();try{if(v)localStorage.setItem(KEYB,v);else localStorage.removeItem(KEYB)}catch(e){}drawQr()};
+  $('qr-try').onclick=function(){if(!qrArea)return;clientArea={name:qrArea.name,phone:qrArea.phone||'',addr:qrArea.addr||'',map:qrArea.map||''};scanned=false;closeQr();showClient()};
+  $('qr-copy').onclick=function(){var l=qrLink();if(!l)return;
+    var done=function(ok){$('qr-msg').textContent=ok?'Link copied.':'Select the link above and copy it.'};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(l).then(function(){done(true)},function(){done(false)})}else done(false)}catch(e){done(false)}};
+  function applyHash(){var t=(location.hash||'').replace(/^#/,'');if(!t)return false;var a=tokenToArea(t);if(!a)return false;clientArea=a;scanned=true;showClient();return true}
+  window.addEventListener('hashchange',applyHash);
+  loadReq();load();loadMeta();normAreas();render();syncUndo();applyHash();
+  function syncLock(){
+    var open=$('ov').classList.contains('on')||$('ov2').classList.contains('on')||$('ov3').classList.contains('on')||$('ov4').classList.contains('on')||$('ov5').classList.contains('on')||$('ov6').classList.contains('on')||$('ov7').classList.contains('on'),lk=document.body.classList.contains('lock');
+    if(open&&!lk){lockY=window.pageYOffset||0;document.body.style.top=(-lockY)+'px';document.body.classList.add('lock')}
+    else if(!open&&lk){document.body.classList.remove('lock');document.body.style.top='';window.scrollTo(0,lockY)}
+  }
+  if(window.MutationObserver){var mo=new MutationObserver(syncLock);mo.observe($('ov'),{attributes:true,attributeFilter:['class']});mo.observe($('ov2'),{attributes:true,attributeFilter:['class']});mo.observe($('ov3'),{attributes:true,attributeFilter:['class']});mo.observe($('ov4'),{attributes:true,attributeFilter:['class']});mo.observe($('ov5'),{attributes:true,attributeFilter:['class']});mo.observe($('ov6'),{attributes:true,attributeFilter:['class']});mo.observe($('ov7'),{attributes:true,attributeFilter:['class']})}
+})();
+</script>
+</body>
+</html>

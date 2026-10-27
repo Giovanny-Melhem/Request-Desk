@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request Desk</title>
+<style>
+:root{--bg:#fdf9ee;--card:#fff;--ink:#1a1a1a;--muted:#6b6455;--gold:#b8901a;--gold-soft:#d4af37}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0b0b;--card:#161616;--ink:#f3eedd;--muted:#a89f88;--gold:#d4af37;--gold-soft:#d4af37}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.5;padding:48px 20px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:2.6rem;margin:0 0 4px;font-weight:400}
+h1 em{color:var(--gold)}
+.tag{color:var(--muted);margin:0 0 32px;font-family:system-ui,sans-serif}
+.card{display:block;background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:20px 22px;margin-bottom:16px;text-decoration:none;color:inherit}
+.card:hover,.card:focus-visible{outline:2px solid var(--gold-soft)}
+.card h2{margin:0 0 4px;font-size:1.25rem;font-weight:400}
+.card p{margin:0;color:var(--muted);font-family:system-ui,sans-serif;font-size:.95rem}
+.badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);border-radius:999px;font:600 .7rem system-ui,sans-serif;letter-spacing:.08em;padding:2px 10px;margin-bottom:8px}
+footer{margin-top:32px;color:var(--muted);font:.85rem system-ui,sans-serif}
+</style>
+</head>
+<body>
+<main>
+  <h1>Request <em>Desk</em></h1>
+  <p class="tag">One board for every job, from request to payment.</p>
+  <a class="card" href="v2/">
+    <span class="badge">LATEST</span>
+    <h2>V2 prototype</h2>
+    <p>Adds areas (Jobs and Information), cards, notes, per-area reset and clearer status hints.</p>
+  </a>
+  <a class="card" href="v0/">
+    <span class="badge">FIRST VERSION</span>
+    <h2>V0 prototype</h2>
+    <p>The first clickable prototype: piles, pending dates, payment status and a client request form.</p>
+  </a>
+  <footer>A low-res prototype made for a design research course. Everything is saved in your own browser, on your own device.</footer>
+</main>
+</body>
+</html>

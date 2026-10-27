@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Request Desk V0 (low-res prototype)</title>
+<style>
+:root{--bg:#f7f4ec;--card:#fff;--colbg:#fffdf7;--text:#171717;--muted:#5f5f5f;--gold:#d4af37;--goldb:#b8901a;--goldtx:#8a6a0a;--bad:#b00020;
+--hdbg:#fffaf0;--hdtx:#171717;--hdsub:#5f5f5f;--colhd:#fff;--colhdtx:#171717;--tagbg:#171717;--tagtx:#fff;--imgbg:#efe6c8;--imgtx:#8a6a0a;--pickbg:#fff;--picktx:#171717;--field:#fff;
+--pat:rgba(184,144,26,.10);--glow:rgba(212,175,55,.22);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0b0b;--card:#1a1a1a;--colbg:#121212;--text:#f4f4f4;--muted:#a9a9a9;--gold:#d9b43c;--goldb:#d9b43c;--goldtx:#e6c552;--bad:#ff7a7a;
+--hdbg:#000;--hdtx:#fff;--hdsub:#b5b5b5;--colhd:#000;--colhdtx:#fff;--tagbg:#f4f4f4;--tagtx:#111;--imgbg:#000;--imgtx:#d9b43c;--pickbg:#000;--picktx:#fff;--field:#0b0b0b;--pat:rgba(217,180,60,.07);--glow:rgba(217,180,60,.14)}}
+:root[data-theme="dark"]{--bg:#0b0b0b;--card:#1a1a1a;--colbg:#121212;--text:#f4f4f4;--muted:#a9a9a9;--gold:#d9b43c;--goldb:#d9b43c;--goldtx:#e6c552;--bad:#ff7a7a;
+--hdbg:#000;--hdtx:#fff;--hdsub:#b5b5b5;--colhd:#000;--colhdtx:#fff;--tagbg:#f4f4f4;--tagtx:#111;--imgbg:#000;--imgtx:#d9b43c;--pickbg:#000;--picktx:#fff;--field:#0b0b0b;--pat:rgba(217,180,60,.07);--glow:rgba(217,180,60,.14)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4;background-color:var(--bg);
+background-image:radial-gradient(circle at 10% 0%,var(--glow),transparent 40%),radial-gradient(circle at 95% 60%,var(--glow),transparent 35%),repeating-linear-gradient(135deg,var(--pat) 0 1px,transparent 1px 26px)}
+.hero{background-color:var(--hdbg);background-image:repeating-linear-gradient(45deg,var(--pat) 0 1px,transparent 1px 14px);border-bottom:3px solid var(--goldb);padding:18px 16px 14px;text-align:center}
+.orn{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--goldtx)}
+.orn span{height:1.5px;width:64px;background:var(--goldb)}
+.orn i{font-style:normal;font-size:13px}
+.brand{font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,6vw,46px);font-weight:400;letter-spacing:.03em;color:var(--hdtx);margin:6px 0 2px;line-height:1.1}
+.brand b{color:var(--goldtx);font-weight:400;font-style:italic}
+.sub{margin:0;color:var(--hdsub);font-size:14px;letter-spacing:.04em}
+.ver{display:inline-block;margin-top:8px;font-size:11px;color:var(--goldtx);border:1px solid var(--goldb);border-radius:999px;padding:2px 10px;letter-spacing:.1em}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:14px;text-align:left}
+.owedbox{color:var(--hdsub);font-size:13px}
+.owedbox b{display:block;color:var(--goldtx);font-size:24px;font-family:Georgia,serif;font-weight:400;line-height:1.1}
+.wrap{padding:16px}
+.btn{border:1.5px solid var(--goldb);background:var(--gold);color:#111;border-radius:8px;padding:9px 16px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--goldb)}
+.hero .btn.ghost{color:var(--hdtx)}
+.btn.danger{background:#171717;color:#fff;border-color:var(--goldb)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.fn.err{color:var(--bad);font-weight:600}
+.cform{background:var(--card);border:2px solid var(--goldb);border-radius:14px;padding:18px;max-width:430px;margin:0 auto 16px}
+.cform h3{margin:0 0 6px;font-family:Georgia,serif;font-size:20px;font-weight:400}
+.cform .ditem{margin-bottom:8px;cursor:default}
+.cform .ditem:hover{box-shadow:none}
+.ditem .thumb{height:80px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+details{font-size:13px;color:var(--muted);margin-bottom:12px}
+details summary{cursor:pointer}
+details ol{margin:6px 0 0;padding-left:20px}
+.tabs{display:none;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.tabs button{border:1.5px solid var(--goldb);background:var(--card);color:var(--text);border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;white-space:nowrap;cursor:pointer}
+.tabs button.on{background:var(--gold);color:#111;border-color:var(--goldb);font-weight:600}
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
+.col{flex:0 0 250px;background:var(--colbg);border:1.5px solid var(--goldb);border-radius:12px;padding:10px;min-height:150px}
+.col h2{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;background:var(--colhd);color:var(--colhdtx);border:1.5px solid var(--goldb);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center}
+.col h2 span{background:var(--gold);color:#111;border-radius:999px;padding:0 9px;font-size:12px;font-weight:700;letter-spacing:0}
+.card{background:var(--card);border:1.5px solid var(--goldb);border-radius:10px;padding:9px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.card:hover{box-shadow:0 0 0 2px var(--gold)}
+.card.late{border-style:dashed;border-width:2px}
+.img{height:64px;background:var(--imgbg);color:var(--imgtx);border:1px solid var(--goldb);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.08em;margin-bottom:8px}
+.thumb{width:100%;height:96px;object-fit:cover;border-radius:6px;border:1px solid var(--goldb);margin-bottom:8px;display:block}
+.t{font-weight:700;font-size:14px}
+.c{font-size:13px;color:var(--muted)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:12px}
+.tag{background:var(--tagbg);color:var(--tagtx);border-radius:5px;padding:2px 8px;font-weight:600}
+.pd{border:1px solid var(--goldb);border-radius:5px;padding:1px 7px}
+.pd.late-t{color:var(--bad);border-color:var(--bad);border-style:dashed;font-weight:700}
+.owed{background:var(--gold);color:#111;border-radius:5px;padding:2px 8px;font-weight:700}
+.paid{border:1px solid var(--muted);color:var(--muted);border-radius:5px;padding:1px 7px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.ov.on{display:flex}
+.ov{overscroll-behavior:contain}
+body.lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+.dlg{background:var(--card);border:2px solid var(--goldb);border-radius:14px;padding:18px;width:100%;max-width:390px;max-height:92vh;max-height:92dvh;overflow:auto;overscroll-behavior:contain}
+.dlg h3{margin:0 0 6px;font-family:Georgia,serif;font-size:20px;font-weight:400}
+.dlg p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+label.l{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input[type=text],input[type=number],input[type=date],select{width:100%;padding:9px;border:1.5px solid var(--goldb);border-radius:8px;background:var(--field);color:var(--text);font:inherit}
+input:focus,select:focus{outline:2px solid var(--goldb);outline-offset:1px}
+.pick{display:inline-block;position:relative;overflow:hidden;border:1.5px solid var(--goldb);border-radius:8px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;background:var(--pickbg);color:var(--picktx);margin:0 6px 6px 0}
+.over{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.pick.alt{background:transparent;color:var(--text)}
+.hid{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.fn{font-size:12px;color:var(--muted);margin-top:6px}
+.pv{width:100%;max-height:140px;object-fit:contain;border:1px solid var(--goldb);border-radius:8px;margin-top:8px;display:none;background:var(--imgbg)}
+.due{background:var(--card);border:2px solid var(--goldb);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.due h2{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.due h2 span{background:var(--gold);color:#111;border-radius:999px;padding:0 9px;font-size:12px;font-weight:700;letter-spacing:0}
+.due .none{margin:0;font-size:13px;color:var(--muted)}
+.dlist{display:flex;gap:8px;flex-wrap:wrap}
+.ditem{flex:1 1 220px;border:1.5px dashed var(--goldb);border-radius:8px;padding:8px 10px;cursor:pointer;background:var(--card)}
+.ditem:hover{box-shadow:0 0 0 2px var(--gold)}
+.ditem .when{font-size:12px;font-weight:700;margin-top:4px}
+.ditem .when.late-t{color:var(--bad)}
+@media (max-width:700px){.board{display:block;overflow:visible}.col{display:none;width:100%}.col.active{display:block}.tabs{display:flex}.orn span{width:36px}}
+</style>
+</head>
+<body>
+<header class="hero" id="hdr">
+  <div class="orn"><span></span><i>&#9670;</i><span></span></div>
+  <h1 class="brand">Request <b>Desk</b></h1>
+  <p class="sub">One board for every job, from request to payment</p>
+  <span class="ver">V0 PROTOTYPE</span>
+  <div class="bar">
+    <div class="owedbox">Total owed<b id="tot">$0</b></div>
+    <div><button class="btn" id="add">Add job</button> <button class="btn ghost" id="undo" disabled>Undo delete</button> <button class="btn ghost" id="cv">Client view</button> <button class="btn ghost" id="th">Light mode</button> <button class="btn ghost" id="rst">Reset</button></div>
+  </div>
+</header>
+<div class="wrap" id="app">
+  <details id="tasks"><summary>Test tasks for yourself</summary>
+    <ol>
+      <li>A new request just came in on WhatsApp. Add it to the board.</li>
+      <li>You are mid-job. Park one job until Friday.</li>
+      <li>Which jobs are on standby, and which clients owe you money?</li>
+      <li>A client just paid. Update their job.</li>
+      <li>It is a new morning and you are about to start work. Which standby jobs need you first?</li>
+      <li>A job is finished. Move it out of your way.</li>
+      <li>A client sent a request through Client view. Review it and add it to the right pile.</li>
+    </ol>
+  </details>
+  <div class="due" id="due" aria-live="polite"></div>
+  <div class="due" id="inbox" style="display:none"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="board" id="board"></div>
+</div>
+
+<div id="client" style="display:none">
+  <header class="hero cl">
+    <div class="orn"><span></span><i>&#9670;</i><span></span></div>
+    <h1 class="brand">Request <b>Desk</b></h1>
+    <p class="sub">Send a request to your freelancer</p>
+    <span class="ver">CLIENT VIEW · PROTOTYPE</span>
+    <div class="bar">
+      <div class="owedbox">Requests go to the freelancer’s inbox on this device.</div>
+      <div><button class="btn ghost" id="c-back">Back to freelancer view</button></div>
+    </div>
+  </header>
+  <div class="wrap cwrap">
+    <div class="cform">
+      <h3>New request</h3>
+      <label class="l" for="c-name">Your name</label><input id="c-name" type="text" dir="auto" autocomplete="name">
+      <label class="l" for="c-title">What do you need?</label><input id="c-title" type="text" dir="auto" autocomplete="off">
+      <label class="l" for="c-type">Type of request</label><select id="c-type"><option value="new">A new job</option><option value="redo">A change to an earlier job</option></select>
+      <div id="c-refwrap" style="display:none"><label class="l" for="c-ref">Which earlier job?</label><input id="c-ref" type="text" dir="auto" autocomplete="off"></div>
+      <label class="l">Picture <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <label class="pick">Choose picture from gallery<input class="over" id="c-img" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+      <div class="fn" id="c-fn">No picture chosen</div>
+      <img class="pv" id="c-pv" alt="Picture preview">
+      <div><button class="btn ghost" id="c-rm" style="margin-top:8px;padding:5px 10px;font-size:12px;display:none">Remove picture</button></div>
+      <label class="l" for="c-date">Wanted by <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="c-date" type="date">
+      <div class="fn err" id="c-err" style="display:none">Please add your name and what you need.</div>
+      <div class="acts"><button class="btn" id="c-send">Send request</button></div>
+      <div class="fn" id="c-ok" style="display:none">Request sent. The freelancer will review it.</div>
+    </div>
+    <div class="cform">
+      <h3>Your requests</h3>
+      <div id="c-mine"></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dt">
+  <h3 id="dt">Job</h3>
+  <label class="l" for="f-client">Client</label><input id="f-client" type="text" dir="auto" autocomplete="off">
+  <label class="l" for="f-title">Job</label><input id="f-title" type="text" dir="auto" autocomplete="off">
+  <label class="l">Picture <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+  <label class="pick">Choose picture from gallery<input class="over" id="f-img" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+  <div class="fn" id="fn">No picture chosen</div>
+  <div class="fn">If your gallery does not open on your phone, open this page directly in Chrome or Safari, not inside another app.</div>
+  <img class="pv" id="pv" alt="Picture preview">
+  <div><button class="btn ghost" id="rm" style="margin-top:8px;padding:5px 10px;font-size:12px;display:none">Remove picture</button></div>
+  <label class="l" for="f-size">Size</label><select id="f-size"><option value="S">Small</option><option value="L">Large</option></select>
+  <label class="l" for="f-status">Work status</label>
+  <select id="f-status"><option>New</option><option>In progress</option><option>Redo</option><option>Pending</option><option>Done</option></select>
+  <div id="f-datewrap"><label class="l" for="f-date">Pending date <span style="font-weight:400;color:var(--muted)">(when to come back to it)</span></label><input id="f-date" type="date"><div class="fn err" id="f-dateerr" style="display:none">Pick a day to come back to this job.</div></div>
+  <label class="l" for="f-pay">Payment</label><select id="f-pay"><option value="owed">Owed</option><option value="paid">Paid</option></select>
+  <label class="l" for="f-amt">Amount owed ($)</label><input id="f-amt" type="text" inputmode="numeric" autocomplete="off">
+  <div class="acts">
+    <button class="btn" id="sv">Save</button>
+    <button class="btn ghost" id="mp">Mark paid</button>
+    <button class="btn ghost" id="cn">Cancel</button>
+    <button class="btn ghost" id="dl">Delete</button>
+  </div>
+</div></div>
+
+<div class="ov" id="ov3"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="qt">
+  <h3 id="qt">Client request</h3>
+  <div id="q-sum"></div>
+  <label class="l" for="q-status">Add to</label><select id="q-status"><option>New</option><option>Redo</option></select>
+  <label class="l" for="q-size">Size</label><select id="q-size"><option value="S">Small</option><option value="L">Large</option></select>
+  <label class="l" for="q-amt">Amount owed ($) <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="q-amt" type="text" inputmode="numeric" autocomplete="off">
+  <div class="acts">
+    <button class="btn" id="q-ok">Accept into board</button>
+    <button class="btn ghost" id="q-no">Decline</button>
+    <button class="btn ghost" id="q-cl">Close</button>
+  </div>
+</div></div>
+
+<div class="ov" id="ov2"><div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="rt">
+  <h3 id="rt">Reset the board</h3>
+  <p>This deletes every job, client request and picture on the board. You can bring them back with Undo delete until you close or reload the page.</p>
+  <div class="acts">
+    <button class="btn danger" id="ry">Delete all jobs</button>
+    
+    <button class="btn ghost" id="rn">Cancel, keep my jobs</button>
+  </div>
+</div></div>
+
+<script>
+(function(){
+  var KEY='rd_v0', TH='rd_theme', STATUS=['New','In progress','Redo','Pending','Done'], editing=null, tab='New', img='', undoStack=[], lockY=0, KEYR='rd_v0_req', requests=[], reqEditing=null, cimg='';
+  var $=function(i){return document.getElementById(i)};
+  var root=document.documentElement;
+  function eff(){var a=root.getAttribute('data-theme');return a||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+  function thLabel(){$('th').textContent=eff()==='dark'?'Light mode':'Dark mode'}
+  try{var st=localStorage.getItem(TH);if(st)root.setAttribute('data-theme',st)}catch(e){}
+  thLabel();
+  $('th').onclick=function(){var n=eff()==='dark'?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem(TH,n)}catch(e){}thLabel()};
+  function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(x<10?'0':'')+x}
+  function off(n){var d=new Date();d.setDate(d.getDate()+n);return iso(d)}
+  function seed(){return [
+    {id:1,client:'Client A',title:'Motorbike sticker (name + design)',size:'S',status:'In progress',date:'',pay:'owed',amt:40,img:''},
+    {id:2,client:'Client B',title:'Wedding name calligraphy',size:'L',status:'New',date:'',pay:'owed',amt:120,img:''},
+    {id:3,client:'Client C',title:'Shop logo (changes requested)',size:'S',status:'Redo',date:'',pay:'paid',amt:0,img:''},
+    {id:4,client:'Client D',title:'Car door lettering',size:'L',status:'Pending',date:off(2),pay:'owed',amt:80,img:''},
+    {id:5,client:'Client E',title:'Birthday sticker set',size:'S',status:'Pending',date:off(-1),pay:'paid',amt:0,img:''},
+    {id:6,client:'Client A',title:'Menu board typography',size:'L',status:'New',date:'',pay:'owed',amt:150,img:''},
+    {id:7,client:'Client F',title:'Window decal lettering',size:'S',status:'Pending',date:off(0),pay:'owed',amt:60,img:''}
+  ]}
+  var jobs;
+  function load(){try{var s=localStorage.getItem(KEY);jobs=s?JSON.parse(s):seed()}catch(e){jobs=seed()}}
+  function loadReq(){try{var q=localStorage.getItem(KEYR);requests=q?JSON.parse(q):[]}catch(e){requests=[]}}
+  function saveReq(){try{localStorage.setItem(KEYR,JSON.stringify(requests))}catch(e){}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(jobs))}catch(e){}}
+  function snap(){if(!jobs.length&&!requests.length)return;undoStack.push(JSON.stringify({j:jobs,r:requests}));if(undoStack.length>10)undoStack.shift();syncUndo()}
+  function syncUndo(){$('undo').disabled=!undoStack.length}
+  function syncDate(){var p=$('f-status').value==='Pending';$('f-datewrap').style.display=p?'':'none';$('f-dateerr').style.display='none'}
+  function fmt(d){return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function num(s){s=String(s).replace(/[\u0660-\u0669]/g,function(d){return d.charCodeAt(0)-1632}).replace(/[\u06F0-\u06F9]/g,function(d){return d.charCodeAt(0)-1776}).replace(/[^0-9.]/g,'');return Number(s)||0}
+  function render(){
+    var today=off(0),b=$('board'),tb=$('tabs'),tot=0;b.innerHTML='';tb.innerHTML='';
+    STATUS.forEach(function(st){
+      var list=jobs.filter(function(j){return j.status===st});
+      var col=document.createElement('div');col.className='col'+(st===tab?' active':'');
+      col.innerHTML='<h2>'+st+' <span>'+list.length+'</span></h2>';
+      var tbn=document.createElement('button');tbn.textContent=st+' ('+list.length+')';tbn.className=st===tab?'on':'';
+      tbn.onclick=function(){tab=st;render()};tb.appendChild(tbn);
+      list.forEach(function(j){
+        var late=j.status==='Pending'&&j.date&&j.date<=today,isToday=late&&j.date===today;
+        var el=document.createElement('div');el.className='card'+(late?' late':'');
+        el.innerHTML=(j.img?'<img class="thumb" alt="" src="'+j.img+'">':'<div class="img">NO PICTURE</div>')+
+          '<div class="t" dir="auto">'+esc(j.title)+'</div><div class="c" dir="auto">'+esc(j.client)+'</div><div class="row">'+
+          '<span class="tag">'+(j.size==='S'?'Small':'Large')+'</span>'+
+          (j.date?'<span class="pd'+(late?' late-t':'')+'">'+(isToday?'Back today':late?'Past pending date: '+fmt(j.date):'Back to it: '+fmt(j.date))+'</span>':'')+
+          (j.pay==='owed'?'<span class="owed">Owed $'+(Number(j.amt)||0)+'</span>':'<span class="paid">Paid</span>')+'</div>';
+        el.onclick=function(){openJob(j)};col.appendChild(el);
+      });
+      b.appendChild(col);
+    });
+    jobs.forEach(function(j){if(j.pay==='owed')tot+=Number(j.amt)||0});
+    var dueBox=$('due'),dueJobs=jobs.filter(function(j){return j.status==='Pending'&&(!j.date||j.date<=today)}).sort(function(x,y){return x.date<y.date?-1:x.date>y.date?1:0});
+    dueBox.innerHTML='<h2>Back today <span>'+dueJobs.length+'</span></h2>';
+    if(!dueJobs.length){var np=document.createElement('p');np.className='none';np.textContent='Nothing on standby is due back today.';dueBox.appendChild(np)}
+    else{var ls=document.createElement('div');ls.className='dlist';
+      dueJobs.forEach(function(j){var it=document.createElement('div'),lt=!j.date||j.date<today;it.className='ditem';
+        it.innerHTML='<div class="t" dir="auto">'+esc(j.title)+'</div><div class="c" dir="auto">'+esc(j.client)+'</div><div class="when'+(lt?' late-t':'')+'">'+(!j.date?'No pending date set':lt?'Past pending date: '+fmt(j.date):'Due back today')+'</div>';
+        it.onclick=function(){openJob(j)};ls.appendChild(it)});
+      dueBox.appendChild(ls)}
+    $('tot').textContent='$'+tot;renderInbox();
+  }
+  function setPic(src,name){
+    img=src||'';var pv=$('pv');pv.src=img;pv.style.display=img?'block':'none';
+    $('fn').textContent=img?(name||'Picture added'):'No picture chosen';$('rm').style.display=img?'':'none';$('f-img').value='';
+  }
+  function openJob(j){
+    editing=j;var n=!j;
+    $('dt').textContent=n?'Add job':'Edit job';
+    $('f-client').value=n?'':j.client;$('f-title').value=n?'':j.title;$('f-size').value=n?'S':j.size;
+    $('f-status').value=n?'New':j.status;$('f-date').value=n?'':j.date;$('f-pay').value=n?'owed':j.pay;$('f-amt').value=n?'':(j.amt||'');
+    $('dl').style.display=n?'none':'';$('mp').style.display=n?'none':'';
+    setPic(n?'':(j.img||''),'Current picture');syncDate();
+    $('ov').classList.add('on');document.querySelector('#ov .dlg').scrollTop=0;
+  }
+  function closeJob(){$('ov').classList.remove('on');editing=null}
+  function read(){return {client:$('f-client').value.trim()||'Client',title:$('f-title').value.trim()||'Untitled job',size:$('f-size').value,img:img,
+    status:$('f-status').value,date:$('f-date').value,pay:$('f-pay').value,amt:$('f-pay').value==='paid'?0:num($('f-amt').value)}}
+  function handleFile(f){
+    if(!f)return;
+    if(f.type&&f.type.indexOf('image/')!==0){$('fn').textContent='That file is not a picture.';return}
+    $('fn').textContent='Loading picture...';
+    var r=new FileReader();
+    r.onerror=function(){$('fn').textContent='Could not read that picture. Try another one.'};
+    r.onload=function(){
+      var im=new Image();
+      im.onerror=function(){$('fn').textContent='This picture format is not supported. Try a JPG or PNG.'};
+      im.onload=function(){
+        var s=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');
+        c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        setPic(c.toDataURL('image/jpeg',0.7),f.name);
+      };
+      im.src=r.result;
+    };
+    r.readAsDataURL(f);
+  }
+  var blurred=false;
+  window.addEventListener('blur',function(){blurred=true});
+  document.addEventListener('visibilitychange',function(){if(document.hidden)blurred=true});
+  $('f-img').onclick=function(){
+    blurred=false;$('fn').textContent='Opening your gallery...';
+    setTimeout(function(){if(!blurred&&$('fn').textContent==='Opening your gallery...')$('fn').textContent='If the gallery did not open, open this page directly in Chrome or Safari.'},2500)};
+  $('f-img').addEventListener('cancel',function(){if(!img)$('fn').textContent='No picture chosen'});
+  $('f-img').onchange=function(){handleFile(this.files&&this.files[0])};
+  document.addEventListener('paste',function(e){if(!$('ov').classList.contains('on'))return;var fl=e.clipboardData&&e.clipboardData.files;if(fl&&fl[0])handleFile(fl[0])});
+  $('ov').addEventListener('dragover',function(e){e.preventDefault()});
+  $('ov').addEventListener('drop',function(e){e.preventDefault();var fl=e.dataTransfer&&e.dataTransfer.files;if(fl&&fl[0])handleFile(fl[0])});
+  $('rm').onclick=function(){setPic('')};
+  $('add').onclick=function(){openJob(null)};
+  $('f-status').onchange=syncDate;
+  $('cn').onclick=closeJob;
+  $('sv').onclick=function(){
+    var v=read();
+    if(v.status==='Pending'&&!v.date){$('f-dateerr').style.display='block';$('f-date').focus();return}
+    if(v.status!=='Pending')v.date='';
+    if(editing){Object.assign(editing,v)}else{v.id=Date.now();jobs.push(v)}
+    tab=v.status;save();render();closeJob()};
+  $('mp').onclick=function(){if(editing){editing.pay='paid';editing.amt=0;save();render();closeJob()}};
+  $('dl').onclick=function(){if(editing){snap();jobs=jobs.filter(function(j){return j!==editing});save();render();closeJob()}};
+  $('ov').onclick=function(e){if(e.target===$('ov'))closeJob()};
+  $('rst').onclick=function(){$('ov2').classList.add('on')};
+  $('rn').onclick=function(){$('ov2').classList.remove('on')};
+  $('ov2').onclick=function(e){if(e.target===$('ov2'))$('ov2').classList.remove('on')};
+  function resetBoard(list){snap();
+    try{localStorage.removeItem(KEY)}catch(e){}
+    jobs=list;requests=[];saveReq();tab='New';editing=null;img='';
+    setPic('');$('ov').classList.remove('on');$('ov2').classList.remove('on');$('tasks').open=false;
+    save();render();window.scrollTo(0,0)}
+  $('ry').onclick=function(){resetBoard([])};
+  $('undo').onclick=function(){if(!undoStack.length)return;var p=JSON.parse(undoStack.pop());jobs=p.j;requests=p.r;save();saveReq();render();syncUndo()};
+  function renderInbox(){
+    var box=$('inbox'),list=requests.filter(function(r){return r.state==='received'});
+    box.style.display=list.length?'':'none';
+    box.innerHTML='<h2>Client requests <span>'+list.length+'</span></h2>';
+    if(!list.length)return;
+    var ls=document.createElement('div');ls.className='dlist';
+    list.forEach(function(r){var it=document.createElement('div');it.className='ditem';
+      it.innerHTML=(r.img?'<img class="thumb" alt="" src="'+r.img+'">':'')+'<div class="t" dir="auto">'+esc(r.title)+'</div><div class="c" dir="auto">'+esc(r.client)+'</div><div class="row"><span class="tag">'+(r.type==='redo'?'Change':'New job')+'</span>'+(r.wanted?'<span class="pd">Wanted by: '+fmt(r.wanted)+'</span>':'')+'</div>';
+      it.onclick=function(){openReq(r)};ls.appendChild(it)});
+    box.appendChild(ls)}
+  function openReq(r){
+    reqEditing=r;
+    $('q-sum').innerHTML=(r.img?'<img class="thumb" style="height:140px" alt="" src="'+r.img+'">':'')+'<div class="t" dir="auto">'+esc(r.title)+'</div><div class="c" dir="auto">'+esc(r.client)+'</div><div class="row"><span class="tag">'+(r.type==='redo'?'Change to an earlier job':'New job')+'</span>'+(r.wanted?'<span class="pd">Wanted by: '+fmt(r.wanted)+'</span>':'')+'</div>'+(r.ref?'<div class="fn" dir="auto">About: '+esc(r.ref)+'</div>':'');
+    $('q-status').value=r.type==='redo'?'Redo':'New';$('q-size').value='S';$('q-amt').value='';
+    $('ov3').classList.add('on');document.querySelector('#ov3 .dlg').scrollTop=0}
+  function closeReq(){$('ov3').classList.remove('on');reqEditing=null}
+  $('q-cl').onclick=closeReq;
+  $('ov3').onclick=function(e){if(e.target===$('ov3'))closeReq()};
+  $('q-ok').onclick=function(){var r=reqEditing;if(!r)return;var id=Date.now(),st=$('q-status').value;
+    jobs.push({id:id,client:r.client,title:r.title,size:$('q-size').value,status:st,date:'',pay:'owed',amt:num($('q-amt').value),img:r.img||''});
+    r.state='accepted';r.jobId=id;tab=st;save();saveReq();render();closeReq()};
+  $('q-no').onclick=function(){var r=reqEditing;if(!r)return;r.state='declined';saveReq();render();closeReq()};
+  function cstatus(r){
+    if(r.state==='declined')return 'Declined';
+    if(r.state==='received')return 'Received';
+    var j=jobs.filter(function(x){return x.id===r.jobId})[0];
+    if(!j)return 'Closed';
+    return j.status==='Done'?'Done':j.status==='New'?'Accepted':'In progress'}
+  function renderMine(){
+    var nm=$('c-name').value.trim().toLowerCase(),box=$('c-mine'),p;box.innerHTML='';
+    if(!nm){p=document.createElement('p');p.className='none';p.textContent='Type your name above to see your requests.';box.appendChild(p);return}
+    var mine=requests.filter(function(r){return r.client.trim().toLowerCase()===nm}).sort(function(x,y){return y.id-x.id});
+    if(!mine.length){p=document.createElement('p');p.className='none';p.textContent='No requests yet.';box.appendChild(p);return}
+    mine.forEach(function(r){var el=document.createElement('div');el.className='ditem';
+      el.innerHTML='<div class="t" dir="auto">'+esc(r.title)+'</div><div class="row"><span class="tag">'+(r.type==='redo'?'Change':'New job')+'</span><span class="pd">'+cstatus(r)+'</span></div>';
+      box.appendChild(el)})}
+  function syncType(){$('c-refwrap').style.display=$('c-type').value==='redo'?'':'none'}
+  function setCPic(src,name){
+    cimg=src||'';var pv=$('c-pv');pv.src=cimg;pv.style.display=cimg?'block':'none';
+    $('c-fn').textContent=cimg?(name||'Picture added'):'No picture chosen';$('c-rm').style.display=cimg?'':'none';$('c-img').value=''}
+  function shrink(f,cb,fail){
+    if(f.type&&f.type.indexOf('image/')!==0){fail('That file is not a picture.');return}
+    var r=new FileReader();
+    r.onerror=function(){fail('Could not read that picture. Try another one.')};
+    r.onload=function(){var im=new Image();
+      im.onerror=function(){fail('This picture format is not supported. Try a JPG or PNG.')};
+      im.onload=function(){var s=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');
+        c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.7))};
+      im.src=r.result};
+    r.readAsDataURL(f)}
+  $('c-img').onchange=function(){var f=this.files&&this.files[0];if(!f)return;
+    $('c-fn').textContent='Loading picture...';
+    shrink(f,function(d){setCPic(d,f.name)},function(m){$('c-fn').textContent=m})};
+  $('c-rm').onclick=function(){setCPic('')};
+  $('c-type').onchange=syncType;
+  $('c-name').oninput=renderMine;
+  $('c-send').onclick=function(){
+    var nm=$('c-name').value.trim(),tt=$('c-title').value.trim(),ty=$('c-type').value;
+    $('c-ok').style.display='none';
+    if(!nm||!tt){$('c-err').style.display='block';return}
+    $('c-err').style.display='none';
+    requests.push({id:Date.now(),client:nm,title:tt,type:ty,ref:ty==='redo'?$('c-ref').value.trim():'',wanted:$('c-date').value,img:cimg,state:'received',jobId:null});
+    saveReq();
+    $('c-title').value='';$('c-ref').value='';$('c-date').value='';$('c-type').value='new';syncType();setCPic('');
+    $('c-ok').style.display='block';renderMine()};
+  function showClient(){$('hdr').style.display='none';$('app').style.display='none';$('client').style.display='';$('c-ok').style.display='none';$('c-err').style.display='none';renderMine();window.scrollTo(0,0)}
+  function showFree(){$('client').style.display='none';$('hdr').style.display='';$('app').style.display='';render();window.scrollTo(0,0)}
+  $('cv').onclick=showClient;
+  $('c-back').onclick=showFree;
+  loadReq();load();render();syncUndo();
+  function syncLock(){
+    var open=$('ov').classList.contains('on')||$('ov2').classList.contains('on')||$('ov3').classList.contains('on'),lk=document.body.classList.contains('lock');
+    if(open&&!lk){lockY=window.pageYOffset||0;document.body.style.top=(-lockY)+'px';document.body.classList.add('lock')}
+    else if(!open&&lk){document.body.classList.remove('lock');document.body.style.top='';window.scrollTo(0,lockY)}
+  }
+  if(window.MutationObserver){var mo=new MutationObserver(syncLock);mo.observe($('ov'),{attributes:true,attributeFilter:['class']});mo.observe($('ov2'),{attributes:true,attributeFilter:['class']});mo.observe($('ov3'),{attributes:true,attributeFilter:['class']})}
+})();
+</script>
+</body>
+</html>

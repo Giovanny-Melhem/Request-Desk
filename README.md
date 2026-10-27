@@ -8,9 +8,9 @@ It was made for a design research course (Workbook 5, low-res prototyping), foll
 
 ## Live demo
 
-- Landing page: https://giovanny-melhem.github.io/request-desk/
-- V2 (latest): https://giovanny-melhem.github.io/request-desk/v2/
-- V0 (first version): https://giovanny-melhem.github.io/request-desk/v0/
+- Landing page: https://giovanny-melhem.github.io/Request-Desk/
+- V2 (latest): https://giovanny-melhem.github.io/Request-Desk/v2/
+- V0 (first version): https://giovanny-melhem.github.io/Request-Desk/v0/
 
 ## What it does
 
